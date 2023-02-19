@@ -7,6 +7,8 @@
 Pulls data from [OMIE](https://omie.es) into Home Assistant. OMIE is the nominated electricity market operator (NEMO)
 for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
 
+![OMIE sensors screenshot](https://user-images.githubusercontent.com/161006/219978890-4d34c2ca-321b-4f29-81fe-44a15768a155.jpg)
+
 ### Sensors
 
 Provides the following sensors by default (unused sensors may be disabled after installation).
