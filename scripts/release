@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+set -e
+
+# https://github.com/conventional-changelog/standard-version/issues/203#issuecomment-872415140
+git tag -l | grep -vE '^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$' | xargs git tag -d
+npx standard-version
+git fetch origin --tags

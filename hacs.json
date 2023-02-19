@@ -1,0 +1,7 @@
+{
+  "name": "OMIE",
+  "render_readme": true,
+  "zip_release": true,
+  "filename": "hass_omie.zip",
+  "homeassistant": "2023.1.0"
+}
