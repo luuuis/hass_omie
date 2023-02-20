@@ -77,7 +77,7 @@ def async_update_omie(session: aiohttp.ClientSession) -> Callable[[], Awaitable[
 
 async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, short_names):
     async with await session.get(source, timeout=DEFAULT_TIMEOUT.total_seconds()) as resp:
-        if resp.status is 404:
+        if resp.status == 404:
             return None
 
         lines = (await resp.text(encoding='iso-8859-1')).splitlines()
