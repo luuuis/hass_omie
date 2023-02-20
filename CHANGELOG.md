@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.2](https://github.com/luuuis/hass_omie/compare/v0.0.1...v0.0.2) (2023-02-20)
+
+
+### Bug Fixes
+
+* `AttributeError` when getting next day's data ([#2](https://github.com/luuuis/hass_omie/issues/2)) ([70e7999](https://github.com/luuuis/hass_omie/commit/70e7999e6e9d342ba68f78b71953fe03427b52a9))
+
 ### 0.0.1 (2023-02-19)
 
 
