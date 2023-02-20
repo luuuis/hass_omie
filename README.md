@@ -7,19 +7,22 @@
 Pulls data from [OMIE](https://omie.es) into Home Assistant. OMIE is the nominated electricity market operator (NEMO)
 for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
 
-![OMIE sensors screenshot](https://user-images.githubusercontent.com/161006/219978890-4d34c2ca-321b-4f29-81fe-44a15768a155.jpg)
+<img alt="OMIE sensors screenshot" src="https://user-images.githubusercontent.com/161006/220145634-06094b7b-2ef3-4a51-9ad1-718d8d8f9516.jpg" width="640"></img>
 
 ### Sensors
 
 Provides the following sensors by default (unused sensors may be disabled after installation).
 
-| Sensor                       |  Unit   | Description                                      |
-|------------------------------|:-------:|--------------------------------------------------|
-| `omie_spot_price_es`         | EUR/MWh | Marginal price - Spain                           |
-| `omie_spot_price_pt`         | EUR/MWh | Marginal price - Portugal                        |
-| `omie_adjustment_price_es`   | EUR/MWh | Adjustment mechanism price - Spain               |
-| `omie_adjustment_price_pt`   | EUR/MWh | Adjustment mechanism price - Portugal            |
-| `omie_adjustment_unit_price` | EUR/MWh | Adjustment unit amount for production facilities |
+| Sensor                          |  Unit   | Description                                                                                                                                                               |
+|---------------------------------|:-------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `omie_spot_price_es`            | EUR/MWh | The marginal price for the current hour in Spain, determined in the day-ahead market of the previous day. Daily average and hourly values are available in attributes.    |
+| `omie_spot_price_pt`            | EUR/MWh | The marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day. Daily average and hourly values are available in attributes. |
+| `omie_adjustment_price_es`(P)   | EUR/MWh | The adjustment mechanism price paid by consumers in Spain.                                                                                                                |
+| `omie_adjustment_price_pt`(P)   | EUR/MWh | Adjustment mechanism price. Hourly value paid by consumers in Portugal.                                                                                                   |
+| `omie_adjustment_unit_price`(P) | EUR/MWh | Adjustment unit amount for production facilities entitled to receive the adjustment.                                                                                      |
+
+Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
+published.
 
 ## Installation
 
@@ -51,3 +54,4 @@ Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below
 Go to the `Integrations` page, click `Add Integration` and select the OMIE integration or click the following button.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=omie)
+
