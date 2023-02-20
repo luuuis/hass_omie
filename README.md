@@ -11,18 +11,27 @@ for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
 
 ### Sensors
 
-Provides the following sensors by default (unused sensors may be disabled after installation).
+Provides the following sensors containing daily and day-ahead values.
 
-| Sensor                          |  Unit   | Description                                                                                                                                                               |
-|---------------------------------|:-------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `omie_spot_price_es`            | EUR/MWh | The marginal price for the current hour in Spain, determined in the day-ahead market of the previous day. Daily average and hourly values are available in attributes.    |
-| `omie_spot_price_pt`            | EUR/MWh | The marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day. Daily average and hourly values are available in attributes. |
-| `omie_adjustment_price_es`(P)   | EUR/MWh | The adjustment mechanism price paid by consumers in Spain.                                                                                                                |
-| `omie_adjustment_price_pt`(P)   | EUR/MWh | Adjustment mechanism price. Hourly value paid by consumers in Portugal.                                                                                                   |
-| `omie_adjustment_unit_price`(P) | EUR/MWh | Adjustment unit amount for production facilities entitled to receive the adjustment.                                                                                      |
+| Sensor                                   |  Unit   | Description                                                                                                                 |
+|------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------------|
+| `omie_spot_price_es`                     | EUR/MWh | Marginal price for the current hour in Spain, determined in the day-ahead market of the previous day.                       |
+| `omie_spot_price_pt`                     | EUR/MWh | Marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day.                    |
+| `omie_adjustment_price_es`(P)            | EUR/MWh | Adjustment mechanism price for the current hour paid by consumers in Spain.                                                 |
+| `omie_adjustment_price_pt`(P)            | EUR/MWh | Adjustment mechanism price for the current hour paid by consumers in Portugal.                                              |
+| `omie_adjustment_unit_price`(P)          | EUR/MWh | Adjustment unit amount for the current hour for production facilities entitled to receive the adjustment.                   |
+| `omie_spot_price_es_tomorrow`            | EUR/MWh | Marginal price for the current hour _of the next day_ in Spain, determined in the day-ahead market of the previous day.     |
+| `omie_spot_price_pt_tomorrow`            | EUR/MWh | Marginal price for the current hour _of the next day_ in Portugal, determined in the day-ahead market of the previous day.  |
+| `omie_adjustment_price_es_tomorrow`(P)   | EUR/MWh | Adjustment mechanism price for the current hour _of the next day_ paid by consumers in Spain.                               |
+| `omie_adjustment_price_pt_tomorrow`(P)   | EUR/MWh | Adjustment mechanism price for the current hour _of the next day_ paid by consumers in Portugal.                            |
+| `omie_adjustment_unit_price_tomorrow`(P) | EUR/MWh | Adjustment unit amount for the current hour _of the next day_ for production facilities entitled to receive the adjustment. |
 
-Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
-published.
+General notes regarding the sensors:
+
+* Daily average and hourly values are available in each sensor's attributes.
+* Unwanted sensors may be disabled in each sensor's Settings after installation.
+* Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
+  published.
 
 ## Installation
 

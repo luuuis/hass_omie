@@ -39,8 +39,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 class OMIEPrices(NamedTuple):
-    spot: dict[str, Any]
-    adjustment: dict[str, Any]
+    spot: dict[str, Any] | None
+    adjustment: dict[str, Any] | None
 
 
 class OMIEData(NamedTuple):
