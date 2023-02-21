@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.3](https://github.com/luuuis/hass_omie/compare/v0.0.2...v0.0.3) (2023-02-21)
+
+
+### Bug Fixes
+
+* adds _tomorrow price sensors ([#3](https://github.com/luuuis/hass_omie/issues/3)) ([03f9099](https://github.com/luuuis/hass_omie/commit/03f90997d28ca4f9444a9446a47a3c080da29fd3))
+
 ### [0.0.2](https://github.com/luuuis/hass_omie/compare/v0.0.1...v0.0.2) (2023-02-20)
 
 
