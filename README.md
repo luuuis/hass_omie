@@ -31,7 +31,7 @@ General notes regarding the sensors:
 * Daily average and hourly values are available in each sensor's attributes.
 * Unwanted sensors may be disabled in each sensor's Settings after installation.
 * Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
-  published.
+  published at around 10:30 PM on the day.
 
 ## Installation
 
