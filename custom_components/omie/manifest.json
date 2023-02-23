@@ -5,10 +5,10 @@
     "@luuuis"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/luuuis/hass_omie",
   "dependencies": [
     "network"
   ],
+  "documentation": "https://github.com/luuuis/hass_omie",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/luuuis/hass_omie/issues",
   "requirements": [],
