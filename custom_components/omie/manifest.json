@@ -1,16 +1,16 @@
 {
   "domain": "omie",
   "name": "OMIE - electricity market operator for the Iberian Peninsula",
-  "version": "0.0.2",
-  "documentation": "https://github.com/luuuis/hass_omie",
-  "issue_tracker": "https://github.com/luuuis/hass_omie/issues",
-  "dependencies": [
-    "network"
-  ],
   "codeowners": [
     "@luuuis"
   ],
-  "requirements": [],
   "config_flow": true,
-  "iot_class": "cloud_polling"
+  "documentation": "https://github.com/luuuis/hass_omie",
+  "dependencies": [
+    "network"
+  ],
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/luuuis/hass_omie/issues",
+  "requirements": [],
+  "version": "0.0.2"
 }
