@@ -62,11 +62,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     coordinator = hass.data[DOMAIN]
 
     device_info = DeviceInfo(
-        configuration_url="https://www.omie.es/",
+        configuration_url="https://www.omie.es/es/market-results",
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, entry.entry_id)},
         manufacturer="OMIE",
         name="OMIE.es",
+        model="MIBEL market results",
     )
 
     spot_today = lambda d: d.today.spot
