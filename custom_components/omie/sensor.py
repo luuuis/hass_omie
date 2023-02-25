@@ -1,19 +1,18 @@
 import logging
 import statistics
-from datetime import datetime
-from typing import Callable, Any
 
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import (ConfigEntry)
-from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.util import slugify
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import slugify, utcnow
 
-from . import OMIEData
+from . import OMIECoordinators
 from .const import DOMAIN
+from .model import OMIEModel
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -59,7 +58,7 @@ ENTITY_NAMES = {
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> bool:
     """Set up OMIE from its config entry."""
-    coordinator = hass.data[DOMAIN]
+    coordinators: OMIECoordinators = hass.data[DOMAIN]
 
     device_info = DeviceInfo(
         configuration_url="https://www.omie.es/es/market-results",
@@ -70,16 +69,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         model="MIBEL market results",
     )
 
-    spot_today = lambda d: d.today.spot
-    adjustment_today = lambda d: d.today.adjustment
-    spot_tomorrow = lambda d: d.tomorrow.spot
-    adjustment_tomorrow = lambda d: d.tomorrow.adjustment
-
-    lang = coordinator.hass.config.language.split('-')[0]
+    lang = hass.config.language.split('-')[0]
     entity_names = ENTITY_NAMES[lang if lang in ENTITY_NAMES.keys() else 'en']
 
     class PriceEntity(SensorEntity):
-        def __init__(self, get_data: Callable[[OMIEData], dict[str, Any]], key: str, id_suffix: str = ''):
+        def __init__(self, coordinator: DataUpdateCoordinator[OMIEModel], key: str, id_suffix: str = ''):
             """Initialize the sensor."""
             self._attr_device_info = device_info
             self._attr_native_unit_of_measurement = "EUR/MWh"
@@ -89,7 +83,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             self._attr_icon = "mdi:currency-eur"
             self._attr_should_poll = False
             self._key = key
-            self._get_data = get_data
+            self._coordinator = coordinator
             self.entity_id = f"sensor.{self._attr_unique_id}"
 
         async def async_added_to_hass(self) -> None:
@@ -100,39 +94,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             def update() -> None:
                 """Update the state."""
                 if self.enabled:
-                    prices = self._get_data(coordinator.data)
-                    if prices is not None:
+                    known = self._coordinator.data is not None
+                    if known:
+                        prices = self._coordinator.data.contents
                         day_hours = prices[f'{self._key}_hourly']
 
-                        # @todo handle DST changes here
-                        self._attr_native_value = day_hours[datetime.now().hour]
+                        # @todo handle longer and shorter days due to DST:
+                        self._attr_native_value = day_hours[utcnow().astimezone().hour]
                         self._attr_extra_state_attributes = {k: prices[k] for k in expose_attrs} | {
                             'day_hours': day_hours,
                             'day_average': round(statistics.mean(day_hours), 2)
                         }
+                    else:
+                        self._attr_native_value = None
 
-                    self._attr_available = self.state is not STATE_UNAVAILABLE
                     self.async_schedule_update_ha_state()
 
-            self.async_on_remove(coordinator.async_add_listener(update))
+            self.async_on_remove(self._coordinator.async_add_listener(update))
 
     sensors = [
         # Today
-        PriceEntity(spot_today, "spot_price_pt"),
-        PriceEntity(spot_today, "spot_price_es"),
-        PriceEntity(adjustment_today, "adjustment_price_es"),
-        PriceEntity(adjustment_today, "adjustment_price_pt"),
-        PriceEntity(adjustment_today, "adjustment_unit_price"),
+        PriceEntity(coordinators.spot, "spot_price_pt"),
+        PriceEntity(coordinators.spot, "spot_price_es"),
+        PriceEntity(coordinators.adjustment, "adjustment_price_es"),
+        PriceEntity(coordinators.adjustment, "adjustment_price_pt"),
+        PriceEntity(coordinators.adjustment, "adjustment_unit_price"),
 
         # Tomorrow
-        PriceEntity(spot_tomorrow, "spot_price_pt", id_suffix='_tomorrow'),
-        PriceEntity(spot_tomorrow, "spot_price_es", id_suffix='_tomorrow'),
-        PriceEntity(adjustment_tomorrow, "adjustment_price_es", id_suffix='_tomorrow'),
-        PriceEntity(adjustment_tomorrow, "adjustment_price_pt", id_suffix='_tomorrow'),
-        PriceEntity(adjustment_tomorrow, "adjustment_unit_price", id_suffix='_tomorrow'),
+        PriceEntity(coordinators.spot_next, "spot_price_pt", id_suffix='_tomorrow'),
+        PriceEntity(coordinators.spot_next, "spot_price_es", id_suffix='_tomorrow'),
+        PriceEntity(coordinators.adjustment_next, "adjustment_price_es", id_suffix='_tomorrow'),
+        PriceEntity(coordinators.adjustment_next, "adjustment_price_pt", id_suffix='_tomorrow'),
+        PriceEntity(coordinators.adjustment_next, "adjustment_unit_price", id_suffix='_tomorrow'),
     ]
 
-    async_add_entities(sensors, True)
-    await coordinator.async_config_entry_first_refresh()
+    async_add_entities(sensors, update_before_add=True)
+    for coordinator in [coordinators.spot, coordinators.adjustment, coordinators.spot_next, coordinators.adjustment_next]:
+        await coordinator.async_config_entry_first_refresh()
 
     return True
