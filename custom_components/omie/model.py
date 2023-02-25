@@ -11,10 +11,6 @@ _LOGGER = logging.getLogger(__name__)
 OMIEFile = dict[str, Union[float, list[float]]]
 """A dict parsed from one of the OMIE CSV file."""
 
-
-# class OMIEFile(NamedTuple):
-#     data: OMIEDict
-
 class OMIEModel(NamedTuple):
     """A piece of data updated at a particular time."""
     updated_at: datetime
