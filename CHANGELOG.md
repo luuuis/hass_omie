@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.4](https://github.com/luuuis/hass_omie/compare/v0.0.3...v0.0.4) (2023-02-26)
+
+
+### Features
+
+* reduce number of network calls ([#5](https://github.com/luuuis/hass_omie/issues/5)) ([fc4e8e8](https://github.com/luuuis/hass_omie/commit/fc4e8e887c9fd3b4b6507870cff3ac2924d2662d))
+
+
+### Bug Fixes
+
+* minor improvement to OMIE device info ([#4](https://github.com/luuuis/hass_omie/issues/4)) ([6a53089](https://github.com/luuuis/hass_omie/commit/6a53089de43b8b18dca77454088a92570ac4618b))
+
 ### [0.0.3](https://github.com/luuuis/hass_omie/compare/v0.0.2...v0.0.3) (2023-02-21)
 
 
