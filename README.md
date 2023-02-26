@@ -1,6 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases)
 
-# Home Assistant OMIE Integration
+# OMIE Home Assistant Integration
 
 ## Features
 
@@ -31,7 +31,7 @@ General notes regarding the sensors:
 * Daily average and hourly values are available in each sensor's attributes.
 * Unwanted sensors may be disabled in each sensor's Settings after installation.
 * Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
-  published.
+  published at around 10:30 PM on the day.
 
 ## Installation
 
@@ -60,7 +60,8 @@ Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below
 
 # Configuration
 
-Go to the `Integrations` page, click `Add Integration` and select the OMIE integration or click the following button.
+Go to the `Integrations` page, click `Add Integration` and select the OMIE Home Assistant Integration or click the
+following button.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=omie)
 
