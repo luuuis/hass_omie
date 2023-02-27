@@ -12,15 +12,15 @@ import pytz
 from aiohttp import ClientSession
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import event
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import utcnow
 
 from .const import DOMAIN, DEFAULT_TIMEOUT
-from .model import OMIEFile, OMIEModel
+from .model import OMIEModel
 
 _LOGGER = logging.getLogger(__name__)
 _CET = pytz.timezone("CET")
-
 
 # language=Markdown
 #
@@ -42,6 +42,12 @@ _CET = pytz.timezone("CET")
 # - https://www.omie.es/en/mercado-de-electricidad
 # - https://www.omie.es/sites/default/files/inline-files/intraday_and_continuous_markets.pdf
 
+DateFactory = Callable[[], date]
+"""Used by the coordinator to work out the market date to fetch."""
+
+UpdateMethod = Callable[[], Awaitable[OMIEModel]]
+"""Method that updates this coordinator's data."""
+
 
 class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
     """Coordinator that fetches new data once per day at the specified time, optionally refreshing it throughout the day."""
@@ -49,29 +55,26 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
     def __init__(self,
                  hass: HomeAssistant,
                  name: str,
-                 none_before: str = "00:00",
-                 update_interval: timedelta | None = None,
-                 update_method: Callable[[], Awaitable[OMIEModel]] | None = None) -> None:
-        super().__init__(hass, _LOGGER, name=f'{DOMAIN}.{name}', update_interval=update_interval, update_method=update_method)
-        hour, minute = none_before.split(":")
-        self._cet_hour = int(hour)
-        self._cet_minute = int(minute)
+                 market_updater: Callable[[ClientSession, DateFactory], UpdateMethod],
+                 market_date: Callable[[], date],
+                 none_before: str | None = None,
+                 update_interval: timedelta | None = None) -> None:
+        super().__init__(hass, _LOGGER, name=f'{DOMAIN}.{name}', update_interval=update_interval,
+                         update_method=market_updater(async_get_clientsession(hass), market_date))
+        self._market_date = market_date
+        self._none_before = list(map(int, none_before.split(":"))) if none_before is not None else [0, 0]
         self._second = random.randint(0, 3)
 
     async def _async_update_data(self) -> OMIEModel | None:
-        now = utcnow().astimezone()
-        none_before = now.astimezone(_CET).replace(hour=self._cet_hour, minute=self._cet_minute, second=0, microsecond=self._microsecond)
-
-        # @todo review edge cases around WET/CET disparity (e.g. when none_before is previous day in PT)
-        if now < none_before:
+        if self._wait_for_none_before():
             # no results can possibly be available at this time of day
-            _LOGGER.debug("%s: _async_update_data returning None before %s:%s CET", self.name, self._cet_hour, self._cet_minute)
+            _LOGGER.debug("%s: _async_update_data returning None before %s CET", self.name, self._none_before)
             return None
 
-        if self.data and (self.update_interval is None or now < (self.data.updated_at + self.update_interval)):
-            # current results are still fresh, don't update:
-            _LOGGER.debug("%s: _async_update_data returning cached (updated_at=%s, update_interval=%s)", self.name, self.data.updated_at,
-                          self.update_interval)
+        if self._data_is_fresh():
+            # current data is still fresh, don't update:
+            _LOGGER.debug("%s: _async_update_data returning cached (market_date=%s, updated_at=%s, update_interval=%s)", self.name,
+                          self.data.market_date, self.data.updated_at, self.update_interval)
             return self.data
 
         else:
@@ -88,17 +91,34 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
             self._unsub_refresh()
             self._unsub_refresh = None
 
+        cet_hour, cet_minute = self._none_before
         now_cet = utcnow().astimezone(_CET)
-        none_before = now_cet.replace(hour=self._cet_hour, minute=self._cet_minute, second=self._second, microsecond=self._microsecond)
+        none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._second, microsecond=self._microsecond)
         next_hour = now_cet.replace(minute=0, second=self._second, microsecond=self._microsecond) + timedelta(hours=1)
 
         # next hour or the none_before time, whichever is soonest
-        next_refresh = (none_before if self._cet_hour == now_cet.hour and none_before > now_cet else next_hour).astimezone()
+        next_refresh = (none_before if cet_hour == now_cet.hour and none_before > now_cet else next_hour).astimezone()
 
         _LOGGER.debug("%s: _schedule_refresh scheduling an update at %s (none_before=%s, next_hour=%s)", self.name,
                       next_refresh,
                       none_before, next_hour)
         self._unsub_refresh = event.async_track_point_in_utc_time(self.hass, self._job, next_refresh)
+
+    def _wait_for_none_before(self) -> bool:
+        """Whether the coordinator should wait for `none_before`."""
+        now = utcnow()
+        cet_hour, cet_minute = self._none_before
+        none_before = now.astimezone(tz=_CET).replace(
+            hour=cet_hour,
+            minute=cet_minute,
+            second=self._second,
+            microsecond=self._microsecond)
+
+        return now < none_before and none_before.date() == date.today()
+
+    def _data_is_fresh(self) -> bool:
+        return self.data is not None and self.data.market_date == self._market_date() and (
+                self.update_interval is None or utcnow() < (self.data.updated_at + self.update_interval))
 
 
 async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, short_names) -> Optional[OMIEModel]:
@@ -113,10 +133,11 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, shor
         reader = csv.reader(data, delimiter=';', skipinitialspace=True)
         rows = {row[0]: [float(row[i + 1].replace(',', '.')) for i in list(range(24))] for row in reader if row[0] != ''}
 
+        market_date = fetch_date.isoformat()
         file_data = {
             'header': header,
             'fetched': utcnow().isoformat(),
-            'market_date': fetch_date.isoformat(),
+            'market_date': market_date,
             'source': source,
         }
 
@@ -137,6 +158,7 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, shor
 
         return OMIEModel(
             updated_at=utcnow(),
+            market_date=market_date,
             contents=file_data
         )
 
@@ -148,7 +170,7 @@ def _explode(fetch_date: datetime.date):
     return yy, MM, dd, f'{dd}_{MM}_{yy}'
 
 
-def spot_price(client_session: ClientSession, get_date: Callable[[], date]) -> Callable[[], Awaitable[OMIEModel]]:
+def spot_price(client_session: ClientSession, get_date: DateFactory) -> UpdateMethod:
     async def fetch() -> OMIEModel:
         fetch_date = get_date()
         yy, MM, dd, dd_MM_yy = _explode(fetch_date)
@@ -170,7 +192,7 @@ def spot_price(client_session: ClientSession, get_date: Callable[[], date]) -> C
     return fetch
 
 
-def adjustment_price(client_session: ClientSession, get_date: Callable[[], date]) -> Callable[[], Awaitable[OMIEFile]]:
+def adjustment_price(client_session: ClientSession, get_date: DateFactory) -> UpdateMethod:
     async def fetch():
         fetch_date = get_date()
         yy, MM, dd, dd_MM_yy = _explode(fetch_date)

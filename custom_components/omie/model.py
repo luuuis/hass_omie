@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from typing import NamedTuple, Union
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -15,6 +15,9 @@ OMIEFile = dict[str, Union[float, list[float]]]
 class OMIEModel(NamedTuple):
     """A piece of data updated at a particular time."""
     updated_at: datetime
+    """The fetch date/time."""
+    market_date: date
+    """The day that the data relates to."""
     contents: OMIEFile
 
 
