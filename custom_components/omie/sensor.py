@@ -129,7 +129,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     ]
 
     async_add_entities(sensors, update_before_add=True)
-    for coordinator in [coordinators.spot, coordinators.adjustment, coordinators.spot_next, coordinators.adjustment_next]:
-        await coordinator.async_config_entry_first_refresh()
+    for c in [coordinators.spot, coordinators.adjustment, coordinators.spot_next, coordinators.adjustment_next]:
+        await c.async_config_entry_first_refresh()
 
     return True
