@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.5](https://github.com/luuuis/hass_omie/compare/v0.0.4...v0.0.5) (2023-03-03)
+
+
+### Bug Fixes
+
+* spot/adjustment sensors don't update when a new day rolls over ([#6](https://github.com/luuuis/hass_omie/issues/6)) ([3408325](https://github.com/luuuis/hass_omie/commit/34083256a949ed8a7d359dca3b3b2aae141e2894))
+
 ### [0.0.4](https://github.com/luuuis/hass_omie/compare/v0.0.3...v0.0.4) (2023-02-26)
 
 
