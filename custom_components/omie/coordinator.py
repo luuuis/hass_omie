@@ -5,7 +5,7 @@ import logging
 import random
 import statistics
 from datetime import timedelta, datetime, date
-from typing import Callable, Awaitable, Optional
+from typing import Callable, Awaitable, Optional, NamedTuple
 
 import aiohttp
 import pytz
@@ -121,7 +121,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
                 self.update_interval is None or utcnow() < (self.data.updated_at + self.update_interval))
 
 
-async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, short_names) -> Optional[OMIEModel]:
+async def fetch_to_dict(session: aiohttp.ClientSession, source: str, market_date: date, short_names: dict[str, str]) -> Optional[OMIEModel]:
     async with await session.get(source, timeout=DEFAULT_TIMEOUT.total_seconds()) as resp:
         if resp.status == 404:
             return None
@@ -133,11 +133,10 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, shor
         reader = csv.reader(data, delimiter=';', skipinitialspace=True)
         rows = {row[0]: [float(row[i + 1].replace(',', '.')) for i in list(range(24))] for row in reader if row[0] != ''}
 
-        market_date = fetch_date.isoformat()
         file_data = {
             'header': header,
             'fetched': utcnow().isoformat(),
-            'market_date': market_date,
+            'market_date': market_date.isoformat(),
             'source': source,
         }
 
@@ -163,20 +162,28 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source, fetch_date, shor
         )
 
 
-def _explode(fetch_date: datetime.date):
-    yy = fetch_date.year
-    MM = str.zfill(str(fetch_date.month), 2)
-    dd = str.zfill(str(fetch_date.day), 2)
-    return yy, MM, dd, f'{dd}_{MM}_{yy}'
+class DateComponents(NamedTuple):
+    """A Date formatted for use in OMIE data file names."""
+    date: date
+    yy: str
+    MM: str
+    dd: str
+    dd_MM_yy: str
+
+    @staticmethod
+    def decompose(a_date: datetime.date) -> DateComponents:
+        year = a_date.year
+        month = str.zfill(str(a_date.month), 2)
+        day = str.zfill(str(a_date.day), 2)
+        return DateComponents(date=a_date, yy=year, MM=month, dd=day, dd_MM_yy=f'{day}_{month}_{year}')
 
 
-def spot_price(client_session: ClientSession, get_date: DateFactory) -> UpdateMethod:
+def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod:
     async def fetch() -> OMIEModel:
-        fetch_date = get_date()
-        yy, MM, dd, dd_MM_yy = _explode(fetch_date)
-        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{yy}/MES_{MM}/TXT/INT_PBC_EV_H_1_{dd_MM_yy}_{dd_MM_yy}.TXT'
+        dc = DateComponents.decompose(get_market_date())
+        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{dc.yy}/MES_{dc.MM}/TXT/INT_PBC_EV_H_1_{dc.dd_MM_yy}_{dc.dd_MM_yy}.TXT'
 
-        return await fetch_to_dict(client_session, source, fetch_date, {
+        return await fetch_to_dict(client_session, source, dc.date, {
             "Energía total con bilaterales del mercado Ibérico (MWh)": 'energy_with_bilaterals_es_pt',
             "Energía total de compra sistema español (MWh)": 'energy_purchases_es',
             "Energía total de compra sistema portugués (MWh)": 'energy_purchases_pt',
@@ -192,13 +199,12 @@ def spot_price(client_session: ClientSession, get_date: DateFactory) -> UpdateMe
     return fetch
 
 
-def adjustment_price(client_session: ClientSession, get_date: DateFactory) -> UpdateMethod:
+def adjustment_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod:
     async def fetch():
-        fetch_date = get_date()
-        yy, MM, dd, dd_MM_yy = _explode(fetch_date)
-        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{yy}/MES_{MM}/TXT/INT_MAJ_EV_H_{dd_MM_yy}_{dd_MM_yy}.TXT'
+        dc = DateComponents.decompose(get_market_date())
+        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{dc.yy}/MES_{dc.MM}/TXT/INT_MAJ_EV_H_{dc.dd_MM_yy}_{dc.dd_MM_yy}.TXT'
 
-        return await fetch_to_dict(client_session, source, fetch_date, {
+        return await fetch_to_dict(client_session, source, get_market_date(), {
             "Precio de ajuste en el sistema español (EUR/MWh)": 'adjustment_price_es',
             "Precio de ajuste en el sistema portugués (EUR/MWh)": 'adjustment_price_pt',
             "Energía horaria sujeta al MAJ a los consumidores MIBEL (MWh)": 'adjustment_energy',
