@@ -60,8 +60,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     """Set up OMIE from its config entry."""
     coordinators: OMIECoordinators = hass.data[DOMAIN]
 
+    lang = hass.config.language.split('-')[0]
+    omie_lang = lang if lang in ENTITY_NAMES.keys() else 'en'
+
     device_info = DeviceInfo(
-        configuration_url="https://www.omie.es/es/market-results",
+        configuration_url=f"https://www.omie.es/{omie_lang}/market-results",
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, entry.entry_id)},
         manufacturer="OMIE",
@@ -69,8 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         model="MIBEL market results",
     )
 
-    lang = hass.config.language.split('-')[0]
-    entity_names = ENTITY_NAMES[lang if lang in ENTITY_NAMES.keys() else 'en']
+    entity_names = ENTITY_NAMES[omie_lang]
 
     class PriceEntity(SensorEntity):
         def __init__(self, coordinator: DataUpdateCoordinator[OMIEModel], key: str, id_suffix: str = ''):
