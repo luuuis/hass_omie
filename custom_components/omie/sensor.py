@@ -13,66 +13,26 @@ from homeassistant.util import slugify, utcnow
 from . import OMIECoordinators
 from .const import DOMAIN
 from .model import OMIEModel
+from .translations import ENTITY_NAMES, DEVICE_NAMES
 
 _LOGGER = logging.getLogger(__name__)
-
-ENTITY_NAMES = {
-    "en": {
-        "spot_price_es": "Marginal price - Spain",
-        "spot_price_pt": "Marginal price - Portugal",
-        "adjustment_price_es": "Adjustment mechanism price - Spain",
-        "adjustment_price_pt": "Adjustment mechanism price - Portugal",
-        "adjustment_unit_price": "Adjustment unit amount for production facilities",
-        "spot_price_es_tomorrow": "Marginal price tomorrow - Spain",
-        "spot_price_pt_tomorrow": "Marginal price tomorrow - Portugal",
-        "adjustment_price_es_tomorrow": "Adjustment mechanism price tomorrow - Spain",
-        "adjustment_price_pt_tomorrow": "Adjustment mechanism price tomorrow - Portugal",
-        "adjustment_unit_price_tomorrow": "Adjustment unit amount for production facilities tomorrow"
-    },
-    "es": {
-        "spot_price_es": "Precio marginal - España",
-        "spot_price_pt": "Precio marginal - Portugal",
-        "adjustment_price_es": "Precio del mecanismo de ajuste - España",
-        "adjustment_price_pt": "Precio del mecanismo de ajuste - Portugal",
-        "adjustment_unit_price": "Cuantía unitaria del ajuste para instalaciones de producción",
-        "spot_price_es_tomorrow": "Precio marginal mañana - España",
-        "spot_price_pt_tomorrow": "Precio marginal mañana - Portugal",
-        "adjustment_price_es_tomorrow": "Precio del mecanismo de ajuste mañana - España",
-        "adjustment_price_pt_tomorrow": "Precio del mecanismo de ajuste mañana - Portugal",
-        "adjustment_unit_price_tomorrow": "Cuantía unitaria del ajuste para instalaciones de producción mañana"
-    },
-    "pt": {
-        "spot_price_es": "Preço marginal - Espanha",
-        "spot_price_pt": "Preço marginal - Portugal",
-        "adjustment_price_es": "Preço do mecanismo de ajuste - Espanha",
-        "adjustment_price_pt": "Preço do mecanismo de ajuste - Portugal",
-        "adjustment_unit_price": "Valor unitário do ajuste para instalações de produção",
-        "spot_price_es_tomorrow": "Preço marginal amanhã - Espanha",
-        "spot_price_pt_tomorrow": "Preço marginal amanhã - Portugal",
-        "adjustment_price_es_tomorrow": "Preço do mecanismo de ajuste amanhã - Espanha",
-        "adjustment_price_pt_tomorrow": "Preço do mecanismo de ajuste amanhã - Portugal",
-        "adjustment_unit_price_tomorrow": "Valor unitário do ajuste para instalações de produção amanhã"
-    },
-}
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> bool:
     """Set up OMIE from its config entry."""
     coordinators: OMIECoordinators = hass.data[DOMAIN]
 
-    lang = hass.config.language.split('-')[0]
-    omie_lang = lang if lang in ENTITY_NAMES.keys() else 'en'
-
+    device_names = DEVICE_NAMES.get_all(hass.config.language)
     device_info = DeviceInfo(
-        configuration_url=f"https://www.omie.es/{omie_lang}/market-results",
+        configuration_url=f"https://www.omie.es/{DEVICE_NAMES.lang(hass.config.language)}/market-results",
         entry_type=DeviceEntryType.SERVICE,
         identifiers={(DOMAIN, entry.entry_id)},
-        manufacturer="OMIE",
-        name="OMIE.es",
-        model="MIBEL market results",
+        manufacturer=device_names.device_manufacturer,
+        name=device_names.device_name,
+        model=device_names.device_model,
     )
 
-    entity_names = ENTITY_NAMES[omie_lang]
+    entity_names = ENTITY_NAMES.get_all(hass.config.language)
 
     class PriceEntity(SensorEntity):
         def __init__(self, coordinator: DataUpdateCoordinator[OMIEModel], key: str, id_suffix: str = ''):
@@ -81,7 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             self._attr_native_unit_of_measurement = "EUR/MWh"
             self._attr_state_class = SensorStateClass.MEASUREMENT
             self._attr_unique_id = slugify(f'omie_{key}{id_suffix}')
-            self._attr_name = entity_names[f'{key}{id_suffix}']
+            self._attr_name = getattr(entity_names, f'{key}{id_suffix}')
             self._attr_icon = "mdi:currency-eur"
             self._attr_should_poll = False
             self._key = key
