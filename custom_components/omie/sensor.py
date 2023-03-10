@@ -107,6 +107,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                         }
                     else:
                         self._attr_native_value = None
+                        self._attr_extra_state_attributes = None
 
                     self.async_schedule_update_ha_state()
 
