@@ -7,6 +7,8 @@ from datetime import datetime, timedelta, tzinfo, date
 import pytz
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import (ConfigEntry)
+from homeassistant.const import CURRENCY_EURO
+from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
@@ -45,7 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
         def __init__(self, sources: OMIESources, key: str, tz: tzinfo):
             """Initialize the sensor."""
             self._attr_device_info = device_info
-            self._attr_native_unit_of_measurement = "EUR/MWh"
+            self._attr_native_unit_of_measurement = f"{CURRENCY_EURO}/{UnitOfEnergy.MEGA_WATT_HOUR}"
             self._attr_state_class = SensorStateClass.MEASUREMENT
             self._attr_unique_id = slugify(f'omie_{key}')
             self._attr_name = getattr(entity_names, f'{key}')
