@@ -21,6 +21,8 @@ from .model import OMIEModel
 
 _LOGGER = logging.getLogger(__name__)
 _CET = pytz.timezone("CET")
+_HOURS = list(range(25))
+"""Max number of hours in a day (on the day that DST ends)."""
 
 # language=Markdown
 #
@@ -128,10 +130,11 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source: str, market_date
 
         lines = (await resp.text(encoding='iso-8859-1')).splitlines()
         header = lines[0]
-        data = lines[2:]
+        csv_data = lines[2:]
 
-        reader = csv.reader(data, delimiter=';', skipinitialspace=True)
-        rows = {row[0]: [float(row[i + 1].replace(',', '.')) for i in list(range(24))] for row in reader if row[0] != ''}
+        reader = csv.reader(csv_data, delimiter=';', skipinitialspace=True)
+        rows = [row for row in reader]
+        hourly_values = {row[0]: [_to_float(row[h + 1]) for h in _HOURS if len(row) > h + 1 and row[h + 1] != ''] for row in rows}
 
         file_data = {
             'header': header,
@@ -140,8 +143,8 @@ async def fetch_to_dict(session: aiohttp.ClientSession, source: str, market_date
             'source': source,
         }
 
-        for k in rows:
-            hourly = rows[k]
+        for k in hourly_values:
+            hourly = hourly_values[k]
             if k in short_names:
                 # hourly & daily avg/sum
                 key = short_names[k]
@@ -213,3 +216,7 @@ def adjustment_price(client_session: ClientSession, get_market_date: DateFactory
         })
 
     return fetch
+
+
+def _to_float(n: str) -> float | None:
+    return n if n is None else float(n.replace(',', '.'))
