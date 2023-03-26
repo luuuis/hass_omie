@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/luuuis/hass_omie/compare/v0.0.5...v0.0.6) (2023-03-26)
+
+
+### Bug Fixes
+
+* clear _tomorrow sensor attributes when state is unknown ([#7](https://github.com/luuuis/hass_omie/issues/7)) ([204c427](https://github.com/luuuis/hass_omie/commit/204c42786bdf3446490a8a94630d1ee10cdfdc72))
+* don't error on shorter days when entering DST ([#10](https://github.com/luuuis/hass_omie/issues/10)) ([58d8a69](https://github.com/luuuis/hass_omie/commit/58d8a69dae3a79404f3aefa2f9cfe6b68e0c886f))
+* interpolate language into omie.es link ([#9](https://github.com/luuuis/hass_omie/issues/9)) ([a86a057](https://github.com/luuuis/hass_omie/commit/a86a05758f023a64a2d76eb52da94a4d81f36a34))
+
 ### [0.0.5](https://github.com/luuuis/hass_omie/compare/v0.0.4...v0.0.5) (2023-03-03)
 
 
