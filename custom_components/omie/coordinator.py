@@ -8,7 +8,6 @@ from datetime import timedelta, datetime, date
 from typing import Callable, Awaitable, Optional, NamedTuple
 
 import aiohttp
-import pytz
 from aiohttp import ClientSession
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import event
@@ -16,11 +15,10 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import utcnow
 
-from .const import DOMAIN, DEFAULT_TIMEOUT
+from .const import DOMAIN, DEFAULT_TIMEOUT, CET
 from .model import OMIEModel
 
 _LOGGER = logging.getLogger(__name__)
-_CET = pytz.timezone("CET")
 _HOURS = list(range(25))
 """Max number of hours in a day (on the day that DST ends)."""
 
@@ -94,7 +92,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
             self._unsub_refresh = None
 
         cet_hour, cet_minute = self._none_before
-        now_cet = utcnow().astimezone(_CET)
+        now_cet = utcnow().astimezone(CET)
         none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._second, microsecond=self._microsecond)
         next_hour = now_cet.replace(minute=0, second=self._second, microsecond=self._microsecond) + timedelta(hours=1)
 
@@ -108,15 +106,15 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
 
     def _wait_for_none_before(self) -> bool:
         """Whether the coordinator should wait for `none_before`."""
-        now = utcnow()
+        cet_now = utcnow().astimezone(tz=CET)
         cet_hour, cet_minute = self._none_before
-        none_before = now.astimezone(tz=_CET).replace(
+        none_before = cet_now.replace(
             hour=cet_hour,
             minute=cet_minute,
             second=self._second,
             microsecond=self._microsecond)
 
-        return now < none_before and none_before.date() == date.today()
+        return cet_now < none_before and none_before.date() == cet_now.date()
 
     def _data_is_fresh(self) -> bool:
         return self.data is not None and self.data.market_date == self._market_date() and (
