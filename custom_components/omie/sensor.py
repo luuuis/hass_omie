@@ -1,21 +1,28 @@
+from __future__ import annotations
+
 import logging
 import statistics
+from datetime import datetime, timedelta, tzinfo, date
 
+import pytz
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import (ConfigEntry)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import slugify, utcnow
+from pytz.tzinfo import StaticTzInfo
 
 from . import OMIECoordinators
-from .const import DOMAIN
-from .model import OMIEModel
+from .const import DOMAIN, CET
+from .model import OMIESources, OMIEModel
 from .translations import ENTITY_NAMES, DEVICE_NAMES
 
 _LOGGER = logging.getLogger(__name__)
+
+_TZ_LISBON = pytz.timezone('Europe/Lisbon')
+_TZ_MADRID = pytz.timezone('Europe/Madrid')
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> bool:
@@ -35,64 +42,109 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     entity_names = ENTITY_NAMES.get_all(hass.config.language)
 
     class PriceEntity(SensorEntity):
-        def __init__(self, coordinator: DataUpdateCoordinator[OMIEModel], key: str, id_suffix: str = ''):
+        def __init__(self, sources: OMIESources, key: str, tz: tzinfo):
             """Initialize the sensor."""
             self._attr_device_info = device_info
             self._attr_native_unit_of_measurement = "EUR/MWh"
             self._attr_state_class = SensorStateClass.MEASUREMENT
-            self._attr_unique_id = slugify(f'omie_{key}{id_suffix}')
-            self._attr_name = getattr(entity_names, f'{key}{id_suffix}')
+            self._attr_unique_id = slugify(f'omie_{key}')
+            self._attr_name = getattr(entity_names, f'{key}')
             self._attr_icon = "mdi:currency-eur"
             self._attr_should_poll = False
             self._key = key
-            self._coordinator = coordinator
+            self._sources = sources
+            self._tz = tz
             self.entity_id = f"sensor.{self._attr_unique_id}"
 
         async def async_added_to_hass(self) -> None:
             """Register callbacks."""
-            expose_attrs = ['fetched', 'market_date', 'source', 'header']
 
             @callback
             def update() -> None:
-                """Update the state."""
-                if self.enabled:
-                    known = self._coordinator.data is not None
-                    if known:
-                        prices = self._coordinator.data.contents
-                        day_hours = prices[f'{self._key}_hourly']
+                """Update this sensor's state."""
+                today_data = self._sources.today.data
+                tomorrow_data = self._sources.tomorrow.data
+                yesterday_data = self._sources.yesterday.data
 
-                        # @todo handle longer and shorter days due to DST:
-                        self._attr_native_value = day_hours[utcnow().astimezone().hour]
-                        self._attr_extra_state_attributes = {k: prices[k] for k in expose_attrs} | {
-                            'day_hours': day_hours,
-                            'day_average': round(statistics.mean(day_hours), 2)
-                        }
-                    else:
-                        self._attr_native_value = None
-                        self._attr_extra_state_attributes = None
+                if None in [today_data, yesterday_data]:
+                    # not all necessary data available yet
+                    self._attr_native_value = None
+                    self._attr_extra_state_attributes = None
+                    return
 
-                    self.async_schedule_update_ha_state()
+                series_name = f'{self._key}_hourly'
 
-            self.async_on_remove(self._coordinator.async_add_listener(update))
+                cet_today_hourly_data = _localize_hourly_data(today_data, series_name)
+                cet_tomorrow_hourly_data = _localize_hourly_data(tomorrow_data, series_name)
+                cet_yesterday_hourly_data = _localize_hourly_data(yesterday_data, series_name)
+                cet_hourly_data = cet_yesterday_hourly_data | cet_today_hourly_data | cet_tomorrow_hourly_data
+
+                local_tz = pytz.timezone(self.hass.config.time_zone)
+                now = utcnow().astimezone(local_tz)
+                today = now.date()
+                tomorrow = today + timedelta(days=1)
+
+                local_today_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(today, local_tz)}
+                local_tomorrow_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(tomorrow, local_tz)}
+                local_start_of_hour = local_tz.normalize(now.replace(minute=0, second=0, microsecond=0))
+
+                self._attr_native_value = local_today_hourly_data.get(local_start_of_hour)
+                self._attr_extra_state_attributes = {
+                    'today_average': _day_average(local_today_hourly_data),
+                    'today_hours': local_today_hourly_data,
+                    'today_provisional': None in local_today_hourly_data.values(),
+                    'tomorrow_average': _day_average(local_tomorrow_hourly_data),
+                    'tomorrow_hours': local_tomorrow_hourly_data if len(local_tomorrow_hourly_data) > 0 else None,
+                    'tomorrow_provisional': len(local_tomorrow_hourly_data) == 0 or None in local_tomorrow_hourly_data.values(),
+                    'OMIE_today_average': _day_average(cet_today_hourly_data),
+                    'OMIE_tomorrow_average': _day_average(cet_tomorrow_hourly_data),
+                }
+
+                self.async_schedule_update_ha_state()
+
+            self.async_on_remove(self._sources.today.async_add_listener(update))
+            self.async_on_remove(self._sources.tomorrow.async_add_listener(update))
+            self.async_on_remove(self._sources.yesterday.async_add_listener(update))
 
     sensors = [
-        # Today
-        PriceEntity(coordinators.spot, "spot_price_pt"),
-        PriceEntity(coordinators.spot, "spot_price_es"),
-        PriceEntity(coordinators.adjustment, "adjustment_price_es"),
-        PriceEntity(coordinators.adjustment, "adjustment_price_pt"),
-        PriceEntity(coordinators.adjustment, "adjustment_unit_price"),
-
-        # Tomorrow
-        PriceEntity(coordinators.spot_next, "spot_price_pt", id_suffix='_tomorrow'),
-        PriceEntity(coordinators.spot_next, "spot_price_es", id_suffix='_tomorrow'),
-        PriceEntity(coordinators.adjustment_next, "adjustment_price_es", id_suffix='_tomorrow'),
-        PriceEntity(coordinators.adjustment_next, "adjustment_price_pt", id_suffix='_tomorrow'),
-        PriceEntity(coordinators.adjustment_next, "adjustment_unit_price", id_suffix='_tomorrow'),
+        PriceEntity(sources=coordinators.spot, key="spot_price_pt", tz=_TZ_LISBON),
+        PriceEntity(sources=coordinators.spot, key="spot_price_es", tz=_TZ_MADRID),
+        PriceEntity(sources=coordinators.adjustment, key="adjustment_price_pt", tz=_TZ_LISBON),
+        PriceEntity(sources=coordinators.adjustment, key="adjustment_price_es", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
-    for c in [coordinators.spot, coordinators.adjustment, coordinators.spot_next, coordinators.adjustment_next]:
-        await c.async_config_entry_first_refresh()
+    for c in [coordinators.spot, coordinators.adjustment]:
+        await c.today.async_config_entry_first_refresh()
+        await c.tomorrow.async_config_entry_first_refresh()
+        await c.yesterday.async_config_entry_first_refresh()
 
     return True
+
+
+def _localize_hourly_data(results: OMIEModel, key: str) -> dict[datetime, float]:
+    """Localize incoming hourly data to the CET timezone."""
+    if results is None:
+        return {}
+    else:
+        market_date = results.market_date
+        hourly_data: list[float] = results.contents[key]
+
+        hours_in_day = len(hourly_data)  # between 23 and 25 (inclusive) due to DST changeover
+        midnight = CET.localize(datetime(market_date.year, market_date.month, market_date.day))
+        return {CET.normalize(midnight + timedelta(hours=h)): hourly_data[h] for h in range(hours_in_day)}
+
+
+def _day_hours(day: date, tz: StaticTzInfo) -> list[datetime]:
+    """Returns a list of every hour in the given date, normalized to the given time zone."""
+    zero = tz.localize(datetime(day.year, day.month, day.day))
+    hours = [tz.normalize(zero + timedelta(hours=h)) for h in range(25)]
+    return [h for h in hours if h.date() == day]  # 25th hour only occurs once a year
+
+
+def _day_average(hours_in_day: dict[datetime, float]) -> float | None:
+    """Returns the arithmetic mean of the hours' prices if possible."""
+    if hours_in_day is None or len(hours_in_day) == 0:
+        return None
+    else:
+        return round(statistics.mean(filter(lambda x: x is not None, hours_in_day.values())), 2)

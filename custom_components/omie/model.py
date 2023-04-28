@@ -13,23 +13,32 @@ OMIEFile = dict[str, Union[float, list[float]]]
 
 
 class OMIEModel(NamedTuple):
-    """A piece of data updated at a particular time."""
+    """OMIE market results for a given date."""
     updated_at: datetime
     """The fetch date/time."""
+
     market_date: date
     """The day that the data relates to."""
+
     contents: OMIEFile
+    """Data fetched from OMIE."""
+
+
+class OMIESources(NamedTuple):
+    """Pair of coordinators that source OMIE market results for today and tomorrow."""
+    today: DataUpdateCoordinator[OMIEModel]
+    """Today's market results (CET)."""
+
+    tomorrow: DataUpdateCoordinator[OMIEModel]
+    """Tomorrow's market results (CET)."""
+
+    yesterday: DataUpdateCoordinator[OMIEModel]
+    """Yesterday's market results (CET)."""
 
 
 class OMIECoordinators(NamedTuple):
-    spot: DataUpdateCoordinator[OMIEModel]
-    """Today's spot."""
+    spot: OMIESources
+    """Spot prices."""
 
-    spot_next: DataUpdateCoordinator[OMIEModel]
-    """Tomorrow's spot."""
-
-    adjustment: DataUpdateCoordinator[OMIEModel]
-    """Today's adjustment."""
-
-    adjustment_next: DataUpdateCoordinator[OMIEModel]
-    """Tomorrow's adjustment."""
+    adjustment: OMIESources
+    """Adjustment mechanism prices."""
