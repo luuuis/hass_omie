@@ -7,24 +7,18 @@
 Pulls data from [OMIE](https://omie.es) into Home Assistant. OMIE is the nominated electricity market operator (NEMO)
 for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
 
-<img alt="OMIE sensors screenshot" src="https://user-images.githubusercontent.com/161006/220145634-06094b7b-2ef3-4a51-9ad1-718d8d8f9516.jpg" width="640"></img>
+<img alt="OMIE sensors screenshot" src="https://user-images.githubusercontent.com/161006/235292164-d552d1b2-0d2d-4931-a9ea-6954665cca23.jpg" width="640"></img>
 
 ### Sensors
 
 Provides the following sensors containing daily and day-ahead values.
 
-| Sensor                                   |  Unit   | Description                                                                                                                 |
-|------------------------------------------|:-------:|-----------------------------------------------------------------------------------------------------------------------------|
-| `omie_spot_price_es`                     | EUR/MWh | Marginal price for the current hour in Spain, determined in the day-ahead market of the previous day.                       |
-| `omie_spot_price_pt`                     | EUR/MWh | Marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day.                    |
-| `omie_adjustment_price_es`(P)            | EUR/MWh | Adjustment mechanism price for the current hour paid by consumers in Spain.                                                 |
-| `omie_adjustment_price_pt`(P)            | EUR/MWh | Adjustment mechanism price for the current hour paid by consumers in Portugal.                                              |
-| `omie_adjustment_unit_price`(P)          | EUR/MWh | Adjustment unit amount for the current hour for production facilities entitled to receive the adjustment.                   |
-| `omie_spot_price_es_tomorrow`            | EUR/MWh | Marginal price for the current hour _of the next day_ in Spain, determined in the day-ahead market of the previous day.     |
-| `omie_spot_price_pt_tomorrow`            | EUR/MWh | Marginal price for the current hour _of the next day_ in Portugal, determined in the day-ahead market of the previous day.  |
-| `omie_adjustment_price_es_tomorrow`(P)   | EUR/MWh | Adjustment mechanism price for the current hour _of the next day_ paid by consumers in Spain.                               |
-| `omie_adjustment_price_pt_tomorrow`(P)   | EUR/MWh | Adjustment mechanism price for the current hour _of the next day_ paid by consumers in Portugal.                            |
-| `omie_adjustment_unit_price_tomorrow`(P) | EUR/MWh | Adjustment unit amount for the current hour _of the next day_ for production facilities entitled to receive the adjustment. |
+| Sensor                        | Unit  | Description                                                                                              |
+|-------------------------------|:-----:|----------------------------------------------------------------------------------------------------------|
+| `omie_spot_price_es`          | €/MWh | Marginal price for the current hour in Spain, determined in the day-ahead market of the previous day.    |
+| `omie_spot_price_pt`          | €/MWh | Marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day. |
+| `omie_adjustment_price_es`(P) | €/MWh | Adjustment mechanism price for the current hour paid by consumers in Spain.                              |
+| `omie_adjustment_price_pt`(P) | €/MWh | Adjustment mechanism price for the current hour paid by consumers in Portugal.                           |
 
 General notes regarding the sensors:
 
