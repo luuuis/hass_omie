@@ -144,7 +144,8 @@ def _day_hours(day: date, tz: StaticTzInfo) -> list[datetime]:
 
 def _day_average(hours_in_day: dict[datetime, float]) -> float | None:
     """Returns the arithmetic mean of the hours' prices if possible."""
-    if hours_in_day is None or len(hours_in_day) == 0:
+    values = [] if hours_in_day is None else list(filter(lambda elem: elem is not None, hours_in_day.values()))
+    if len(values) == 0:
         return None
     else:
-        return round(statistics.mean(filter(lambda x: x is not None, hours_in_day.values())), 2)
+        return round(statistics.mean(values), 2)
