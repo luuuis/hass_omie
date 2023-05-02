@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.0-beta.1](https://github.com/luuuis/hass_omie/compare/v1.0.0-beta.0...v1.0.0-beta.1) (2023-05-02)
+
+
+### Bug Fixes
+
+* StatisticsError raised when rolling over to a new day ([#15](https://github.com/luuuis/hass_omie/issues/15)) ([85e3528](https://github.com/luuuis/hass_omie/commit/85e3528ac6813921c765250263428e9671c2b409))
+* use constants for "€/MWh" ([#16](https://github.com/luuuis/hass_omie/issues/16)) ([b5ac70f](https://github.com/luuuis/hass_omie/commit/b5ac70f3f8b7b988cb3cf584b7ad4b28e0be8d3f))
+
+## [1.0.0-beta.0](https://github.com/luuuis/hass_omie/compare/v0.0.6...v1.0.0-beta.0) (2023-04-28)
+
+
+### ⚠ BREAKING CHANGES
+
+* removes _tomorrow sensors and renamed all attributes
+
+### Features
+
+* changed what sensors are available, attributes and correctly handle non-CET local time zones. ([#14](https://github.com/luuuis/hass_omie/issues/14)) ([8e45e8b](https://github.com/luuuis/hass_omie/commit/8e45e8b507f3bf63c67ae13a77ac6c5b7f102f32))
+
 ### [0.0.6](https://github.com/luuuis/hass_omie/compare/v0.0.5...v0.0.6) (2023-03-26)
 
 
