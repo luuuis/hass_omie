@@ -92,14 +92,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
                 self._attr_native_value = local_today_hourly_data.get(local_start_of_hour)
                 self._attr_extra_state_attributes = {
+                    'OMIE_today_average': _day_average(cet_today_hourly_data),
+                    'today_provisional': None in local_today_hourly_data.values(),
                     'today_average': _day_average(local_today_hourly_data),
                     'today_hours': local_today_hourly_data,
-                    'today_provisional': None in local_today_hourly_data.values(),
+                    'OMIE_tomorrow_average': _day_average(cet_tomorrow_hourly_data),
+                    'tomorrow_provisional': len(local_tomorrow_hourly_data) == 0 or None in local_tomorrow_hourly_data.values(),
                     'tomorrow_average': _day_average(local_tomorrow_hourly_data),
                     'tomorrow_hours': local_tomorrow_hourly_data if len(local_tomorrow_hourly_data) > 0 else None,
-                    'tomorrow_provisional': len(local_tomorrow_hourly_data) == 0 or None in local_tomorrow_hourly_data.values(),
-                    'OMIE_today_average': _day_average(cet_today_hourly_data),
-                    'OMIE_tomorrow_average': _day_average(cet_tomorrow_hourly_data),
                 }
 
                 self.async_schedule_update_ha_state()
