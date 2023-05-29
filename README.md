@@ -4,12 +4,13 @@
 
 ## Features
 
-Pulls data from [OMIE](https://www.omie.es/en) into Home Assistant. OMIE is the nominated electricity market operator (NEMO)
+Pulls data from [OMIE](https://www.omie.es/en) into Home Assistant. OMIE is the nominated electricity market operator (
+NEMO)
 for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
- 
+
 💶 Follow the day-ahead [Spot and Adjustment Mechanism prices](https://www.omie.es/en/spot-hoy) for 🇵🇹 and 🇪🇸.  
 📈 Use sensor attributes to [graph hourly prices](https://github.com/luuuis/hass_omie/wiki/ApexChartsExamples).  
-🧾 [Estimate your power bill](https://github.com/luuuis/hass_omie/wiki/Coop%C3%A9rnico-Base) based on the spot prices.  
+🧾 [Estimate your power bill](https://github.com/luuuis/hass_omie/wiki/Tarifários-Portugal) based on the spot prices.  
 💡 [Check out our Wiki](https://github.com/luuuis/hass_omie/wiki) for examples!
 
 <img alt="Screenshot of OMIE sensors" src="https://user-images.githubusercontent.com/161006/235292328-14b232dd-9d64-4030-a297-53e10a345cf1.jpg"  width="640"></img>  
