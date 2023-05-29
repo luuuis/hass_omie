@@ -59,7 +59,7 @@ Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below
 
 </details>
 
-# Configuration
+## Configuration
 
 Go to the `Integrations` page, click `Add Integration` and select the OMIE Home Assistant Integration or click the
 following button.
