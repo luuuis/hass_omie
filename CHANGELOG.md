@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](https://github.com/luuuis/hass_omie/compare/v1.0.0...v1.0.1) (2023-09-07)
+
+
+### Bug Fixes
+
+* **coordinator:** convert DataUpdateCoordinator._microsecond to int before usage ([#33](https://github.com/luuuis/hass_omie/issues/33)) ([7a5c119](https://github.com/luuuis/hass_omie/commit/7a5c1191bde66a166b571f7e967bcab85930467d))
+
 ## [1.0.0](https://github.com/luuuis/hass_omie/compare/v0.0.6...v1.0.0) (2023-05-06)
 
 
