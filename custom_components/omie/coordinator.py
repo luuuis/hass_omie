@@ -93,8 +93,8 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
 
         cet_hour, cet_minute = self._none_before
         now_cet = utcnow().astimezone(CET)
-        none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._second, microsecond=self._microsecond)
-        next_hour = now_cet.replace(minute=0, second=self._second, microsecond=self._microsecond) + timedelta(hours=1)
+        none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._second, microsecond=int(self._microsecond * 10 ** 6))
+        next_hour = now_cet.replace(minute=0, second=self._second, microsecond=int(self._microsecond * 10 ** 6)) + timedelta(hours=1)
 
         # next hour or the none_before time, whichever is soonest
         next_refresh = (none_before if cet_hour == now_cet.hour and none_before > now_cet else next_hour).astimezone()
@@ -112,7 +112,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
             hour=cet_hour,
             minute=cet_minute,
             second=self._second,
-            microsecond=self._microsecond)
+            microsecond=int(self._microsecond * 10 ** 6))
 
         return cet_now < none_before and none_before.date() == cet_now.date()
 
