@@ -4,6 +4,7 @@ import logging
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.util import utcnow
 
@@ -12,6 +13,8 @@ from .coordinator import spot_price, adjustment_price, OMIEDailyCoordinator
 from .model import OMIECoordinators, OMIESources
 
 _LOGGER = logging.getLogger(__name__)
+
+PLATFORMS = [Platform.SENSOR]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -66,12 +69,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         adjustment=OMIESources(today=adjustment, tomorrow=adjustment_next, yesterday=adjustment_previous)
     )
 
-    hass.async_create_task(hass.config_entries.async_forward_entry_setup(entry, "sensor"))
+    await hass.config_entries.async_forward_entry_setup(entry, PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     hass.data.pop(DOMAIN)
-    hass.async_create_task(hass.config_entries.async_forward_entry_unload(entry, "sensor"))
-    return True
+    unload_ok = await hass.config_entries.async_forward_entry_unload(entry, PLATFORMS)
+    return unload_ok
