@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.4](https://github.com/luuuis/hass_omie/compare/v1.0.3...v1.0.4) (2024-03-07)
+
+
+### Bug Fixes
+
+* use async_forward_entry_setups and async_unload_platforms ([#51](https://github.com/luuuis/hass_omie/issues/51)) ([aeaa3cf](https://github.com/luuuis/hass_omie/commit/aeaa3cf5a2d5bfdc7c8156e69ed52a62304e4bce))
+
 ### [1.0.3](https://github.com/luuuis/hass_omie/compare/v1.0.2...v1.0.3) (2024-03-07)
 
 
