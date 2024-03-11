@@ -96,6 +96,9 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
             self._unsub_refresh()
             self._unsub_refresh = None
 
+        self._omie_schedule_refresh()
+
+    def _omie_schedule_refresh(self):
         cet_hour, cet_minute = self._none_before
         now_cet = utcnow().astimezone(CET)
         none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._schedule_second,
