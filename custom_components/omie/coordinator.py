@@ -25,6 +25,9 @@ _HOURS = list(range(25))
 _SCHEDULE_MAX_DELAY = timedelta(seconds=3)
 """The maximum delay after the scheduled time that we will fetch from OMIE to avoid thundering herd."""
 
+ADJUSTMENT_END_DATE = date(2024, 1, 1)
+"""The date on which the adjustment mechanism is no longer applicable."""
+
 # language=Markdown
 #
 # OMIE market sessions and the values that they influence. Time shown below is publication time in the CET timezone plus 10 minutes.
@@ -208,16 +211,22 @@ def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> U
 
 def adjustment_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod:
     async def fetch():
-        dc = DateComponents.decompose(get_market_date())
-        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{dc.yy}/MES_{dc.MM}/TXT/INT_MAJ_EV_H_{dc.dd_MM_yy}_{dc.dd_MM_yy}.TXT'
+        market_date = get_market_date()
+        if market_date < ADJUSTMENT_END_DATE:
+            dc = DateComponents.decompose(market_date)
+            source = f'https://www.omie.es/sites/default/files/dados/AGNO_{dc.yy}/MES_{dc.MM}/TXT/INT_MAJ_EV_H_{dc.dd_MM_yy}_{dc.dd_MM_yy}.TXT'
 
-        return await fetch_to_dict(client_session, source, get_market_date(), {
-            "Precio de ajuste en el sistema español (EUR/MWh)": 'adjustment_price_es',
-            "Precio de ajuste en el sistema portugués (EUR/MWh)": 'adjustment_price_pt',
-            "Energía horaria sujeta al MAJ a los consumidores MIBEL (MWh)": 'adjustment_energy',
-            "Energía horaria sujeta al mecanismo de ajuste a los consumidores MIBEL (MWh)": 'adjustment_energy',
-            "Cuantía unitaria del ajuste (EUR/MWh)": 'adjustment_unit_price',
-        })
+            return await fetch_to_dict(client_session, source, market_date, {
+                "Precio de ajuste en el sistema español (EUR/MWh)": 'adjustment_price_es',
+                "Precio de ajuste en el sistema portugués (EUR/MWh)": 'adjustment_price_pt',
+                "Energía horaria sujeta al MAJ a los consumidores MIBEL (MWh)": 'adjustment_energy',
+                "Energía horaria sujeta al mecanismo de ajuste a los consumidores MIBEL (MWh)": 'adjustment_energy',
+                "Cuantía unitaria del ajuste (EUR/MWh)": 'adjustment_unit_price',
+            })
+
+        else:
+            # adjustment mechanism ended in 2023
+            return {}
 
     return fetch
 
