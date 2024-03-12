@@ -9,7 +9,7 @@ from typing import Callable, Awaitable, Optional, NamedTuple
 
 import aiohttp
 from aiohttp import ClientSession
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
 from homeassistant.helpers import event
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
@@ -72,6 +72,10 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
         delay_μs = random.randint(0, _SCHEDULE_MAX_DELAY.seconds * 10 ** 6)
         self._schedule_second = delay_μs // 10 ** 6
         self._schedule_microsecond = delay_μs % 10 ** 6
+        self._job = HassJob(
+            self.__omie_handle_refresh_interval,
+            self._job.name,
+            job_type=HassJobType.Callback)
 
     async def _async_update_data(self) -> OMIEModel | None:
         if self._wait_for_none_before():
@@ -99,6 +103,9 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
             self._unsub_refresh()
             self._unsub_refresh = None
 
+        self._omie_schedule_refresh()
+
+    def _omie_schedule_refresh(self):
         cet_hour, cet_minute = self._none_before
         now_cet = utcnow().astimezone(CET)
         none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._schedule_second,
@@ -112,6 +119,17 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
                       next_refresh,
                       none_before, next_hour)
         self._unsub_refresh = event.async_track_point_in_utc_time(self.hass, self._job, next_refresh)
+
+    @callback
+    def __omie_handle_refresh_interval(self, _now: datetime | None = None) -> None:
+        # https://github.com/home-assistant/core/pull/111570/ has broken this coordinator
+        # due to using a different signature that doesn't take in a datetime. since the _now is
+        # provided by async_track_point_in_utc_time we need to shim the callback and then delegate
+        # to the appropriate refresh handler depending on the HA version that is currently running.
+        if hasattr(self, '__wrap_handle_refresh_interval'):
+            self.__wrap_handle_refresh_interval()
+        else:
+            self.hass.async_create_task(self._handle_refresh_interval(_now))
 
     def _wait_for_none_before(self) -> bool:
         """Whether the coordinator should wait for `none_before`."""
