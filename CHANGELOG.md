@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.5](https://github.com/luuuis/hass_omie/compare/v1.0.4...v1.0.5) (2024-03-12)
+
+
+### Bug Fixes
+
+* coordinator refresh handling compatibility with HA 2024.3.0 ([#53](https://github.com/luuuis/hass_omie/issues/53)) ([975950d](https://github.com/luuuis/hass_omie/commit/975950dea43926585021264f58396f34765a3b58))
+* **coordinator:** don't attempt to read adjustment value on or after 2024-01-01 ([#52](https://github.com/luuuis/hass_omie/issues/52)) ([57bf258](https://github.com/luuuis/hass_omie/commit/57bf258ca01d676981cb6c05812479e31716eea0))
+
 ### [1.0.4](https://github.com/luuuis/hass_omie/compare/v1.0.3...v1.0.4) (2024-03-07)
 
 
