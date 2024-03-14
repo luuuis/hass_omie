@@ -244,7 +244,7 @@ def adjustment_price(client_session: ClientSession, get_market_date: DateFactory
 
         else:
             # adjustment mechanism ended in 2023
-            return {}
+            return None
 
     return fetch
 
