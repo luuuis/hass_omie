@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.6](https://github.com/luuuis/hass_omie/compare/v1.0.5...v1.0.6) (2024-03-16)
+
+
+### Bug Fixes
+
+* AttributeError: 'dict' object has no attribute 'market_date' ([#54](https://github.com/luuuis/hass_omie/issues/54)) ([13003ad](https://github.com/luuuis/hass_omie/commit/13003ad361a1a55b6db957a9c02cc1e7a202c4ab))
+
 ### [1.0.5](https://github.com/luuuis/hass_omie/compare/v1.0.4...v1.0.5) (2024-03-12)
 
 
