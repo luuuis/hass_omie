@@ -72,6 +72,10 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
         delay_μs = random.randint(0, _SCHEDULE_MAX_DELAY.seconds * 10 ** 6)
         self._schedule_second = delay_μs // 10 ** 6
         self._schedule_microsecond = delay_μs % 10 ** 6
+        self.__job = HassJob(
+            self._handle_refresh_interval,
+            f'OMIEDailyCoordinator {name}',
+            job_type=HassJobType.Coroutinefunction)
 
     async def _async_update_data(self) -> OMIEModel | None:
         if self._wait_for_none_before():
@@ -114,11 +118,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
         _LOGGER.debug("%s: _schedule_refresh scheduling an update at %s (none_before=%s, next_hour=%s)", self.name,
                       next_refresh,
                       none_before, next_hour)
-        self._unsub_refresh = event.async_track_point_in_utc_time(self.hass, self.__omie_handle_refresh_interval, next_refresh)
-
-    @callback
-    def __omie_handle_refresh_interval(self, _now: datetime | None = None) -> None:
-        self.hass.async_create_task(self._handle_refresh_interval(), eager_start=True)
+        self._unsub_refresh = event.async_track_point_in_utc_time(self.hass, self.__job, next_refresh)
 
     def _wait_for_none_before(self) -> bool:
         """Whether the coordinator should wait for `none_before`."""
