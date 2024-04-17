@@ -138,7 +138,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
 
 
 async def fetch_to_dict(session: aiohttp.ClientSession, source: str, market_date: date, short_names: dict[str, str]) -> Optional[OMIEModel]:
-    async with await session.get(source, timeout=DEFAULT_TIMEOUT.total_seconds()) as resp:
+    async with await session.get(source, ssl=False, timeout=DEFAULT_TIMEOUT.total_seconds()) as resp:
         if resp.status == 404:
             return None
 
