@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.10](https://github.com/luuuis/hass_omie/compare/v1.0.9...v1.0.10) (2024-04-17)
+
+
+### Bug Fixes
+
+* revert temporarily disable SSL verification due to changes in OMIE.es" ([#64](https://github.com/luuuis/hass_omie/issues/64)) ([688c0ea](https://github.com/luuuis/hass_omie/commit/688c0ea2ea722f9c76c719a6d999820b99d47557))
+
 ### [1.0.9](https://github.com/luuuis/hass_omie/compare/v1.0.8...v1.0.9) (2024-04-17)
 
 
