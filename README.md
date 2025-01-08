@@ -42,7 +42,7 @@ Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below
 
 1. Open `Integrations` inside the HACS configuration.
 1. Click on the 3 dots in the top-right corner and select `Custom Repositories`.
-1. Paste in https://github.com/luuuis/hass_omie and select `Integration` as category.
+1. Paste in https://github.com/luuuis/hass_omie and select `Integration` as type.
 1. Once installation is complete, restart Home Assistant.
 
 <details>
