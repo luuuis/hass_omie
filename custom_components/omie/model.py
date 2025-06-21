@@ -39,6 +39,3 @@ class OMIESources(NamedTuple):
 class OMIECoordinators(NamedTuple):
     spot: OMIESources
     """Spot prices."""
-
-    adjustment: OMIESources
-    """Adjustment mechanism prices."""
