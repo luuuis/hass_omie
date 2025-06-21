@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-set -e
-
-git checkout --detach
-npx standard-version --prerelease beta
-git checkout -
