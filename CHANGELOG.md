@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.0.11-beta.1](https://github.com/luuuis/hass_omie/compare/v1.0.10...v1.0.11-beta.1) (2025-06-21)
+
+
+### Build System
+
+* add .release-please-manifest.json ([#76](https://github.com/luuuis/hass_omie/issues/76)) ([c97d68b](https://github.com/luuuis/hass_omie/commit/c97d68bb986d16417bc3995635c89cd853cfd43a))
+* remove reference to release-please manifest ([#78](https://github.com/luuuis/hass_omie/issues/78)) ([8e35e31](https://github.com/luuuis/hass_omie/commit/8e35e31b12a47a27fd46268c0e4aed2b1bbd9872))
+* remove reference to release-please manifest ([#80](https://github.com/luuuis/hass_omie/issues/80)) ([3835c79](https://github.com/luuuis/hass_omie/commit/3835c79938227f73835aba0c2913dac2a7ee59c5))
+* use single package release-please config ([#77](https://github.com/luuuis/hass_omie/issues/77)) ([cd2649a](https://github.com/luuuis/hass_omie/commit/cd2649ae8f8b89f257553de08ff8425c7c39ccb5))
+
 ### [1.0.10](https://github.com/luuuis/hass_omie/compare/v1.0.9...v1.0.10) (2024-04-17)
 
 
