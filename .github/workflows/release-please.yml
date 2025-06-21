@@ -19,7 +19,6 @@ jobs:
           token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
           target-branch: ${{ github.ref_name }}
           config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
       - uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
       - name: Create Release ZIP
