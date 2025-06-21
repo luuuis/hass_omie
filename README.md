@@ -8,7 +8,7 @@ Pulls data from [OMIE](https://www.omie.es/en) into Home Assistant. OMIE is the 
 NEMO)
 for managing the Iberian Peninsula's day-ahead and intraday electricity markets.
 
-💶 Follow the day-ahead [Spot and Adjustment Mechanism prices](https://www.omie.es/en/spot-hoy) for 🇵🇹 and 🇪🇸.  
+💶 Follow the day-ahead [Spot prices](https://www.omie.es/en/spot-hoy) for 🇵🇹 and 🇪🇸.  
 📈 Use sensor attributes to [graph hourly prices](https://github.com/luuuis/hass_omie/wiki/ApexChartsExamples).  
 🧾 [Estimate your power bill](https://github.com/luuuis/hass_omie/wiki/Tarifários-Portugal) based on the spot prices.  
 💡 [Check out our Wiki](https://github.com/luuuis/hass_omie/wiki) for examples!
@@ -24,8 +24,6 @@ Provides the following sensors containing daily and day-ahead values.
 |-------------------------------|:-----:|----------------------------------------------------------------------------------------------------------|
 | `omie_spot_price_es`          | €/MWh | Marginal price for the current hour in Spain, determined in the day-ahead market of the previous day.    |
 | `omie_spot_price_pt`          | €/MWh | Marginal price for the current hour in Portugal, determined in the day-ahead market of the previous day. |
-| `omie_adjustment_price_es`(P) | €/MWh | Adjustment mechanism price for the current hour paid by consumers in Spain.                              |
-| `omie_adjustment_price_pt`(P) | €/MWh | Adjustment mechanism price for the current hour paid by consumers in Portugal.                           |
 
 General notes regarding the sensors:
 

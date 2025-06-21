@@ -111,12 +111,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     sensors = [
         PriceEntity(sources=coordinators.spot, key="spot_price_pt", tz=_TZ_LISBON),
         PriceEntity(sources=coordinators.spot, key="spot_price_es", tz=_TZ_MADRID),
-        PriceEntity(sources=coordinators.adjustment, key="adjustment_price_pt", tz=_TZ_LISBON),
-        PriceEntity(sources=coordinators.adjustment, key="adjustment_price_es", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
-    for c in [coordinators.spot, coordinators.adjustment]:
+    for c in [coordinators.spot]:
         await c.today.async_config_entry_first_refresh()
         await c.tomorrow.async_config_entry_first_refresh()
         await c.yesterday.async_config_entry_first_refresh()

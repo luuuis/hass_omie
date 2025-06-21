@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import utcnow
 
 from .const import (DOMAIN, DEFAULT_UPDATE_INTERVAL, DEFAULT_TIMEOUT, CET)
-from .coordinator import spot_price, adjustment_price, OMIEDailyCoordinator
+from .coordinator import spot_price, OMIEDailyCoordinator
 from .model import OMIECoordinators, OMIESources
 
 _LOGGER = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     cet_yesterday = lambda: cet_today() - timedelta(days=1)
 
     # These are asking to be rewritten into coordinators that do 3 fetches for each
-    # OMIE source file (one for spot and one for adjustment).
+    # OMIE source file: previous, current and next day.
 
     spot = OMIEDailyCoordinator(hass,
                                 "spot",
@@ -46,27 +46,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                                          market_updater=spot_price,
                                          market_date=cet_yesterday)
 
-    adjustment = OMIEDailyCoordinator(hass,
-                                      "adjustment",
-                                      market_updater=adjustment_price,
-                                      market_date=cet_today,
-                                      update_interval=timedelta(hours=1))
-
-    adjustment_next = OMIEDailyCoordinator(hass,
-                                           "adjustment_next",
-                                           market_updater=adjustment_price,
-                                           market_date=cet_tomorrow,
-                                           update_interval=timedelta(hours=1),
-                                           none_before="13:30")
-
-    adjustment_previous = OMIEDailyCoordinator(hass,
-                                               "adjustment_previous",
-                                               market_updater=adjustment_price,
-                                               market_date=cet_yesterday)
-
     hass.data[DOMAIN] = OMIECoordinators(
         spot=OMIESources(today=spot, tomorrow=spot_next, yesterday=spot_previous),
-        adjustment=OMIESources(today=adjustment, tomorrow=adjustment_next, yesterday=adjustment_previous)
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
