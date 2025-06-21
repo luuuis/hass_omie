@@ -1,11 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "release-type": "python",
-  "packages": {
-    ".": {
-      "extra-files": [
-        "custom_components/omie/manifest.json"
-      ]
-    }
-  }
+  "prerelease": true,
+  "extra-files": [
+    "custom_components/omie/manifest.json"
+  ]
 }
