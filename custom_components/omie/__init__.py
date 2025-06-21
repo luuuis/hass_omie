@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__version__ = "1.0.11-beta.1"
+
 import logging
 from datetime import timedelta
 
