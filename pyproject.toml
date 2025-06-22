@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "hass-omie"
-version = "2.0.0-beta.2"
+version = "2.0.0-beta.3"
 description = "OMIE Home Assistant integration"
 authors = ["Luis Miranda <sleepy.gate8799@fastmail.com>"]
 license = "GNU General Public License v3.0"

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.3](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2025-06-22)
+
+
+### Bug Fixes
+
+* release notes badge ([#91](https://github.com/luuuis/hass_omie/issues/91)) ([cfc3c13](https://github.com/luuuis/hass_omie/commit/cfc3c131ff67a9e0212e89d9bb3db0bc08939ddb))
+
 ## [2.0.0-beta.2](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2025-06-22)
 
 
