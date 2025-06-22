@@ -47,8 +47,12 @@ jobs:
           # Fetch current release notes
           NOTES=$(gh release view "$TAG_NAME" --json body -q .body)
 
-          # Prepend the custom line
-          NEW_NOTES="${CUSTOM_LINE}\n\n${NOTES}"
-
-          # Update the release with the new content
-          gh release edit "$TAG_NAME" --notes "$NEW_NOTES"
+          # Write new content to a temp file
+          {
+            echo "$CUSTOM_LINE"
+            echo ""
+            echo "$NOTES"
+          } > NEW_NOTES.md
+      
+          # Update the release
+          gh release edit "$TAG_NAME" --notes-file NEW_NOTES.md
