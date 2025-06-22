@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.1](https://github.com/luuuis/hass_omie/compare/v1.0.11-beta.1...v2.0.0-beta.1) (2025-06-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove MIBEL adjustment sensors ([#83](https://github.com/luuuis/hass_omie/issues/83))
+
+### Features
+
+* use pyomie to fetch data ([#85](https://github.com/luuuis/hass_omie/issues/85)) ([85ca80d](https://github.com/luuuis/hass_omie/commit/85ca80d238e9198e22122b59ea1779bbe10d28d3))
+
+
+### Bug Fixes
+
+* remove MIBEL adjustment sensors ([#83](https://github.com/luuuis/hass_omie/issues/83)) ([a6afbb7](https://github.com/luuuis/hass_omie/commit/a6afbb7417d965e4cb54f2196f2f9c14c84c6d39))
+
 ## [1.0.11-beta.1](https://github.com/luuuis/hass_omie/compare/v1.0.10...v1.0.11-beta.1) (2025-06-21)
 
 
