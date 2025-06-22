@@ -11,7 +11,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.util import utcnow
 
 from .const import (DOMAIN, DEFAULT_UPDATE_INTERVAL, DEFAULT_TIMEOUT, CET)
-from .coordinator import spot_price, OMIEDailyCoordinator
+from .coordinator import spot_price, OMIEDailyCoordinator, DateFactory
 from .model import OMIECoordinators, OMIESources
 
 _LOGGER = logging.getLogger(__name__)

@@ -1,22 +1,20 @@
 from __future__ import annotations
 
-import csv
 import logging
 import random
-import statistics
-from datetime import timedelta, datetime, date
-from typing import Callable, Awaitable, Optional, NamedTuple
+from datetime import timedelta, date
+from typing import Callable, Awaitable, TypeVar
 
-import aiohttp
 from aiohttp import ClientSession
 from homeassistant.core import HomeAssistant, callback, HassJob, HassJobType
 from homeassistant.helpers import event
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import utcnow
+from pyomie.main import spot_price as pyomie_spot
+from pyomie.model import OMIEResults, SpotData
 
-from .const import DOMAIN, DEFAULT_TIMEOUT, CET
-from .model import OMIEModel
+from .const import DOMAIN, CET
 
 _LOGGER = logging.getLogger(__name__)
 _HOURS = list(range(25))
@@ -45,20 +43,22 @@ _SCHEDULE_MAX_DELAY = timedelta(seconds=3)
 # - https://www.omie.es/en/mercado-de-electricidad
 # - https://www.omie.es/sites/default/files/inline-files/intraday_and_continuous_markets.pdf
 
+_DataT = TypeVar("_DataT")
+
 DateFactory = Callable[[], date]
 """Used by the coordinator to work out the market date to fetch."""
 
-UpdateMethod = Callable[[], Awaitable[OMIEModel]]
+UpdateMethod = Callable[[], Awaitable[OMIEResults[_DataT] | None]]
 """Method that updates this coordinator's data."""
 
 
-class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
+class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEResults[_DataT] | None]):
     """Coordinator that fetches new data once per day at the specified time, optionally refreshing it throughout the day."""
 
     def __init__(self,
                  hass: HomeAssistant,
                  name: str,
-                 market_updater: Callable[[ClientSession, DateFactory], UpdateMethod],
+                 market_updater: Callable[[ClientSession, DateFactory], UpdateMethod[_DataT]],
                  market_date: Callable[[], date],
                  none_before: str | None = None,
                  update_interval: timedelta | None = None) -> None:
@@ -134,81 +134,9 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEModel]):
                 self.update_interval is None or utcnow() < (self.data.updated_at + self.update_interval))
 
 
-async def fetch_to_dict(session: aiohttp.ClientSession, source: str, market_date: date, short_names: dict[str, str]) -> Optional[OMIEModel]:
-    async with await session.get(source, timeout=DEFAULT_TIMEOUT.total_seconds()) as resp:
-        if resp.status == 404:
-            return None
-
-        lines = (await resp.text(encoding='iso-8859-1')).splitlines()
-        header = lines[0]
-        csv_data = lines[2:]
-
-        reader = csv.reader(csv_data, delimiter=';', skipinitialspace=True)
-        rows = [row for row in reader]
-        hourly_values = {row[0]: [_to_float(row[h + 1]) for h in _HOURS if len(row) > h + 1 and row[h + 1] != ''] for row in rows}
-
-        file_data = {
-            'header': header,
-            'fetched': utcnow().isoformat(),
-            'market_date': market_date.isoformat(),
-            'source': source,
-        }
-
-        for k in hourly_values:
-            hourly = hourly_values[k]
-            if k in short_names:
-                # hourly & daily avg/sum
-                key = short_names[k]
-
-                suffix, daily = ['average', round(statistics.mean(hourly), 2)] if "(EUR/MWh)" in k else ['total', round(sum(hourly), 1)]
-                file_data.update({
-                    f'{key}_day_{suffix}': daily,
-                    f'{key}_hourly': hourly,
-                })
-            else:
-                # unknown rows, do not process
-                file_data.update({k: hourly})
-
-        return OMIEModel(
-            updated_at=utcnow(),
-            market_date=market_date,
-            contents=file_data
-        )
-
-
-class DateComponents(NamedTuple):
-    """A Date formatted for use in OMIE data file names."""
-    date: date
-    yy: str
-    MM: str
-    dd: str
-    dd_MM_yy: str
-
-    @staticmethod
-    def decompose(a_date: datetime.date) -> DateComponents:
-        year = a_date.year
-        month = str.zfill(str(a_date.month), 2)
-        day = str.zfill(str(a_date.day), 2)
-        return DateComponents(date=a_date, yy=year, MM=month, dd=day, dd_MM_yy=f'{day}_{month}_{year}')
-
-
-def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod:
-    async def fetch() -> OMIEModel:
-        dc = DateComponents.decompose(get_market_date())
-        source = f'https://www.omie.es/sites/default/files/dados/AGNO_{dc.yy}/MES_{dc.MM}/TXT/INT_PBC_EV_H_1_{dc.dd_MM_yy}_{dc.dd_MM_yy}.TXT'
-
-        return await fetch_to_dict(client_session, source, dc.date, {
-            "Energía total con bilaterales del mercado Ibérico (MWh)": 'energy_with_bilaterals_es_pt',
-            "Energía total de compra sistema español (MWh)": 'energy_purchases_es',
-            "Energía total de compra sistema portugués (MWh)": 'energy_purchases_pt',
-            "Energía total de venta sistema español (MWh)": 'energy_sales_es',
-            "Energía total de venta sistema portugués (MWh)": 'energy_sales_pt',
-            "Energía total del mercado Ibérico (MWh)": 'energy_es_pt',
-            "Exportación de España a Portugal (MWh)": 'energy_export_es_to_pt',
-            "Importación de España desde Portugal (MWh)": 'energy_import_es_from_pt',
-            "Precio marginal en el sistema español (EUR/MWh)": 'spot_price_es',
-            "Precio marginal en el sistema portugués (EUR/MWh)": 'spot_price_pt',
-        })
+def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod[SpotData]:
+    async def fetch() -> OMIEResults[SpotData] | None:
+        return await pyomie_spot(client_session, get_market_date())
 
     return fetch
 
