@@ -12,6 +12,10 @@ name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      sha: ${{ steps.release.outputs.sha }}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
@@ -19,15 +23,32 @@ jobs:
           token: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
           target-branch: ${{ github.ref_name }}
           config-file: release-please-config.json
+  customize-github-release:
+    needs: release-please
+    runs-on: ubuntu-latest
+    if: needs.release-please.outputs.release_created == 'true'
+    steps:
       - uses: actions/checkout@v4
-        if: ${{ steps.release.outputs.release_created }}
       - name: Create Release ZIP
-        if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
-        run: git archive --format=zip --output=hass_omie.zip ${{ steps.release.outputs.sha }}:custom_components/omie
+        run: git archive --format=zip --output=hass_omie.zip ${{ needs.release-please.outputs.sha }}:custom_components/omie
       - name: Upload Release ZIP
-        if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag_name }} ./hass_omie.zip
+        run: gh release upload ${{ needs.release-please.outputs.tag_name }} ./hass_omie.zip
+      - name: Add badge to release notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
+        run: |
+          TAG_NAME="${{ needs.release-please.outputs.tag_name }}"
+          CUSTOM_LINE="![GitHub release (by tag)](https://img.shields.io/github/downloads/luuuis/hass_omie/${TAG_NAME}/total?style=flat)"
+
+          # Fetch current release notes
+          NOTES=$(gh release view "$TAG_NAME" --json body -q .body)
+
+          # Prepend the custom line
+          NEW_NOTES="${CUSTOM_LINE}\n\n${NOTES}"
+
+          # Update the release with the new content
+          gh release edit "$TAG_NAME" --notes "$NEW_NOTES"
