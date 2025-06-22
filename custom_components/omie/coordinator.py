@@ -74,7 +74,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEResults[_DataT] | None]):
             f'OMIEDailyCoordinator {name}',
             job_type=HassJobType.Coroutinefunction)
 
-    async def _async_update_data(self) -> OMIEModel | None:
+    async def _async_update_data(self) -> OMIEResults[_DataT] | None:
         if self._wait_for_none_before():
             # no results can possibly be available at this time of day
             _LOGGER.debug("%s: _async_update_data returning None before %s CET", self.name, self._none_before)

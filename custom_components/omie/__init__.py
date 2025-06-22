@@ -10,7 +10,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.util import utcnow
 
-from .const import (DOMAIN, DEFAULT_UPDATE_INTERVAL, DEFAULT_TIMEOUT, CET)
+from .const import DOMAIN, CET
 from .coordinator import spot_price, OMIEDailyCoordinator, DateFactory
 from .model import OMIECoordinators, OMIESources
 
