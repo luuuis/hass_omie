@@ -14,11 +14,12 @@ from homeassistant.helpers.device_registry import DeviceEntryType
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify, utcnow
+from pyomie.model import SpotData, OMIEResults
 from pytz.tzinfo import StaticTzInfo
 
 from . import OMIECoordinators
 from .const import DOMAIN, CET
-from .model import OMIESources, OMIEModel
+from .model import OMIESources
 from .translations import ENTITY_NAMES, DEVICE_NAMES
 
 _LOGGER = logging.getLogger(__name__)
@@ -44,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     entity_names = ENTITY_NAMES.get_all(hass.config.language)
 
     class PriceEntity(SensorEntity):
-        def __init__(self, sources: OMIESources, key: str, tz: tzinfo):
+        def __init__(self, sources: OMIESources[SpotData], key: str, tz: tzinfo):
             """Initialize the sensor."""
             self._attr_device_info = device_info
             self._attr_native_unit_of_measurement = f"{CURRENCY_EURO}/{UnitOfEnergy.MEGA_WATT_HOUR}"
@@ -74,7 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                     self._attr_extra_state_attributes = None
                     return
 
-                series_name = f'{self._key}_hourly'
+                series_name = self._key
 
                 cet_today_hourly_data = _localize_hourly_data(today_data, series_name)
                 cet_tomorrow_hourly_data = _localize_hourly_data(tomorrow_data, series_name)
@@ -122,13 +123,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     return True
 
 
-def _localize_hourly_data(results: OMIEModel, key: str) -> dict[datetime, float]:
+def _localize_hourly_data(results: OMIEResults[SpotData], key: str) -> dict[datetime, float]:
     """Localize incoming hourly data to the CET timezone."""
     if results is None:
         return {}
     else:
         market_date = results.market_date
-        hourly_data: list[float] = results.contents[key]
+        hourly_data: list[float] = getattr(results.contents, key)
 
         hours_in_day = len(hourly_data)  # between 23 and 25 (inclusive) due to DST changeover
         midnight = CET.localize(datetime(market_date.year, market_date.month, market_date.day))

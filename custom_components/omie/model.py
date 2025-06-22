@@ -1,38 +1,28 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, date
-from typing import NamedTuple, Union
+from typing import NamedTuple, Union, TypeVar, Generic
 
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from pyomie.model import OMIEResults
 
 _LOGGER = logging.getLogger(__name__)
 
 OMIEFile = dict[str, Union[float, list[float]]]
 """A dict parsed from one of the OMIE CSV file."""
 
-
-class OMIEModel(NamedTuple):
-    """OMIE market results for a given date."""
-    updated_at: datetime
-    """The fetch date/time."""
-
-    market_date: date
-    """The day that the data relates to."""
-
-    contents: OMIEFile
-    """Data fetched from OMIE."""
+_DataT = TypeVar("_DataT")
 
 
-class OMIESources(NamedTuple):
+class OMIESources(NamedTuple, Generic[_DataT]):
     """Pair of coordinators that source OMIE market results for today and tomorrow."""
-    today: DataUpdateCoordinator[OMIEModel]
+    today: DataUpdateCoordinator[OMIEResults[_DataT]]
     """Today's market results (CET)."""
 
-    tomorrow: DataUpdateCoordinator[OMIEModel]
+    tomorrow: DataUpdateCoordinator[OMIEResults[_DataT]]
     """Tomorrow's market results (CET)."""
 
-    yesterday: DataUpdateCoordinator[OMIEModel]
+    yesterday: DataUpdateCoordinator[OMIEResults[_DataT]]
     """Yesterday's market results (CET)."""
 
 

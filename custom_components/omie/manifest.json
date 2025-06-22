@@ -11,6 +11,8 @@
   "documentation": "https://github.com/luuuis/hass_omie",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/luuuis/hass_omie/issues",
-  "requirements": [],
+  "requirements": [
+    "pyomie>=0.1.1"
+  ],
   "version": "1.0.11-beta.1"
 }
