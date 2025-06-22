@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0-beta.2](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.1...v2.0.0-beta.2) (2025-06-22)
+
+
+### Features
+
+* add shields.io badge to release notes ([8940d02](https://github.com/luuuis/hass_omie/commit/8940d023e9afb2da70072ce1a410527b566356ee))
+
 ## [2.0.0-beta.1](https://github.com/luuuis/hass_omie/compare/v1.0.11-beta.1...v2.0.0-beta.1) (2025-06-22)
 
 
