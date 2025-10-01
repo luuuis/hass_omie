@@ -139,7 +139,3 @@ def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> U
         return await pyomie_spot(client_session, get_market_date())
 
     return fetch
-
-
-def _to_float(n: str) -> float | None:
-    return n if n is None else float(n.replace(',', '.'))
