@@ -12,7 +12,7 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/luuuis/hass_omie/issues",
   "requirements": [
-    "pyomie>=0.1.1"
+    "pyomie>=1.0.0"
   ],
   "version": "2.0.0-beta.3"
 }
