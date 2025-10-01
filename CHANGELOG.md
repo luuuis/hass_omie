@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.3...v2.0.0) (2025-10-01)
+
+
+### Bug Fixes
+
+* handle OMIE quarter-hourly pricing ([#96](https://github.com/luuuis/hass_omie/issues/96)) ([09bbded](https://github.com/luuuis/hass_omie/commit/09bbdedcdcae3625c77fbd9086001c579ac88abb))
+
+
+### Miscellaneous Chores
+
+* release 2.0.0 ([75cfbc5](https://github.com/luuuis/hass_omie/commit/75cfbc563185e9fc89d7248c0f75e47289c58eff))
+
 ## [2.0.0-beta.3](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.2...v2.0.0-beta.3) (2025-06-22)
 
 
