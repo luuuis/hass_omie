@@ -70,7 +70,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 tomorrow_data = self._sources.tomorrow.data
                 yesterday_data = self._sources.yesterday.data
 
-                if today_data is None:
+                if None in [today_data, yesterday_data]:
                     # not all necessary data available yet
                     self._attr_native_value = None
                     self._attr_extra_state_attributes = None
@@ -81,6 +81,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 cet_yesterday_hourly_data = _localize_hourly_data(yesterday_data, self._series)
                 cet_hourly_data = cet_yesterday_hourly_data | cet_today_hourly_data | cet_tomorrow_hourly_data
 
+                _LOGGER.debug(f'*** {self._key}')
+                _LOGGER.debug(f'today_data: {today_data}')
+                _LOGGER.debug(f'cet_today_hourly_data: {cet_today_hourly_data}')
+
                 local_tz = pytz.timezone(self.hass.config.time_zone)
                 now = utcnow().astimezone(local_tz)
                 today = now.date()
@@ -89,6 +93,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 local_today_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(today, local_tz)}
                 local_tomorrow_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(tomorrow, local_tz)}
                 local_start_of_hour = local_tz.normalize(now.replace(minute=0, second=0, microsecond=0))
+
+                # _LOGGER.debug(f'_day_hours({today}, {local_tz}): {_day_hours(today, local_tz)}')
+                # _LOGGER.debug(f'local_start_of_hour: {local_start_of_hour}')
+                # _LOGGER.debug(f'local_today_hourly_data: {local_today_hourly_data}')
 
                 self._attr_native_value = local_today_hourly_data.get(local_start_of_hour)
                 self._attr_extra_state_attributes = {
@@ -110,7 +118,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     sensors = [
         PriceEntity(sources=coordinators.spot, key="spot_price_pt", series="pt_spot_price", tz=_TZ_LISBON),
-        PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
+        # PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
@@ -136,21 +144,21 @@ def _localize_hourly_data(results: OMIEResults[SpotData], series_name: str) -> d
         return {
             hour_start: hour_average
             for hour in range(hours_in_day)
-            if (quarter_hour := hour * 4)
-            if (hour_start := CET.normalize(midnight + timedelta(hours=hour)))
-            if (hour_average := statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4]))
+            for quarter_hour in [hour * 4]
+            for hour_start in [CET.normalize(midnight + timedelta(hours=hour))]
+            for hour_average in [statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4])]
         }
 
 
 def _day_hours(day: date, tz: StaticTzInfo) -> list[datetime]:
-    """Returns a list of every quarter-hour in the given date, normalized to the given time zone."""
+    """Returns a list of every hour in the given date, normalized to the given time zone."""
     zero = tz.localize(datetime(day.year, day.month, day.day))
     hours = [tz.normalize(zero + timedelta(hours=h)) for h in range(25)]
     return [h for h in hours if h.date() == day]  # 25th hour only occurs once a year
 
 
 def _day_average(hours_in_day: dict[datetime, float]) -> float | None:
-    """Returns the arithmetic mean of the day's quarter-hourly prices if possible."""
+    """Returns the arithmetic mean of the day's prices if possible."""
     values = [] if hours_in_day is None else list(filter(lambda elem: elem is not None, hours_in_day.values()))
     if len(values) == 0:
         return None
