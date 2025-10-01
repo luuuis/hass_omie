@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     entity_names = ENTITY_NAMES.get_all(hass.config.language)
 
     class PriceEntity(SensorEntity):
-        def __init__(self, sources: OMIESources[SpotData], key: str, tz: tzinfo):
+        def __init__(self, sources: OMIESources[SpotData], key: str, series: str, tz: tzinfo):
             """Initialize the sensor."""
             self._attr_device_info = device_info
             self._attr_native_unit_of_measurement = f"{CURRENCY_EURO}/{UnitOfEnergy.MEGA_WATT_HOUR}"
@@ -55,6 +55,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             self._attr_icon = "mdi:currency-eur"
             self._attr_should_poll = False
             self._key = key
+            self._series = series
             self._sources = sources
             self._tz = tz
             self.entity_id = f"sensor.{self._attr_unique_id}"
@@ -69,17 +70,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 tomorrow_data = self._sources.tomorrow.data
                 yesterday_data = self._sources.yesterday.data
 
-                if None in [today_data, yesterday_data]:
+                if today_data is None:
                     # not all necessary data available yet
                     self._attr_native_value = None
                     self._attr_extra_state_attributes = None
                     return
 
-                series_name = self._key
-
-                cet_today_hourly_data = _localize_hourly_data(today_data, series_name)
-                cet_tomorrow_hourly_data = _localize_hourly_data(tomorrow_data, series_name)
-                cet_yesterday_hourly_data = _localize_hourly_data(yesterday_data, series_name)
+                cet_today_hourly_data = _localize_hourly_data(today_data, self._series)
+                cet_tomorrow_hourly_data = _localize_hourly_data(tomorrow_data, self._series)
+                cet_yesterday_hourly_data = _localize_hourly_data(yesterday_data, self._series)
                 cet_hourly_data = cet_yesterday_hourly_data | cet_today_hourly_data | cet_tomorrow_hourly_data
 
                 local_tz = pytz.timezone(self.hass.config.time_zone)
@@ -110,8 +109,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             self.async_on_remove(self._sources.yesterday.async_add_listener(update))
 
     sensors = [
-        PriceEntity(sources=coordinators.spot, key="spot_price_pt", tz=_TZ_LISBON),
-        PriceEntity(sources=coordinators.spot, key="spot_price_es", tz=_TZ_MADRID),
+        PriceEntity(sources=coordinators.spot, key="spot_price_pt", series="pt_spot_price", tz=_TZ_LISBON),
+        PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
@@ -123,28 +122,35 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     return True
 
 
-def _localize_hourly_data(results: OMIEResults[SpotData], key: str) -> dict[datetime, float]:
-    """Localize incoming hourly data to the CET timezone."""
+def _localize_hourly_data(results: OMIEResults[SpotData], series_name: str) -> dict[datetime, float]:
+    """Localize incoming quarter-hourly data to the CET timezone."""
     if results is None:
         return {}
     else:
         market_date = results.market_date
-        hourly_data: list[float] = getattr(results.contents, key)
+        quarter_hourly_data: list[float] = getattr(results.contents, series_name)
 
-        hours_in_day = len(hourly_data)  # between 23 and 25 (inclusive) due to DST changeover
+        hours_in_day = int(len(quarter_hourly_data) / 4)  # between 23 and 25 (inclusive) due to DST changeover
         midnight = CET.localize(datetime(market_date.year, market_date.month, market_date.day))
-        return {CET.normalize(midnight + timedelta(hours=h)): hourly_data[h] for h in range(hours_in_day)}
+
+        return {
+            hour_start: hour_average
+            for hour in range(hours_in_day)
+            if (quarter_hour := hour * 4)
+            if (hour_start := CET.normalize(midnight + timedelta(hours=hour)))
+            if (hour_average := statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4]))
+        }
 
 
 def _day_hours(day: date, tz: StaticTzInfo) -> list[datetime]:
-    """Returns a list of every hour in the given date, normalized to the given time zone."""
+    """Returns a list of every quarter-hour in the given date, normalized to the given time zone."""
     zero = tz.localize(datetime(day.year, day.month, day.day))
     hours = [tz.normalize(zero + timedelta(hours=h)) for h in range(25)]
     return [h for h in hours if h.date() == day]  # 25th hour only occurs once a year
 
 
 def _day_average(hours_in_day: dict[datetime, float]) -> float | None:
-    """Returns the arithmetic mean of the hours' prices if possible."""
+    """Returns the arithmetic mean of the day's quarter-hourly prices if possible."""
     values = [] if hours_in_day is None else list(filter(lambda elem: elem is not None, hours_in_day.values()))
     if len(values) == 0:
         return None
