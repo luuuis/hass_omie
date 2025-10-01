@@ -14,7 +14,7 @@ packages = [
 python = ">=3.12,<3.14"
 homeassistant = ">=2025.1.0"
 pytz = "^2025.2"
-pyomie = "~0.1.1"
+pyomie = "~1.0.0"
 
 [build-system]
 requires = ["poetry-core"]
