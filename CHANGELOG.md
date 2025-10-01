@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.1](https://github.com/luuuis/hass_omie/compare/v2.0.0...v2.0.1) (2025-10-01)
+
+
+### Bug Fixes
+
+* off by one in _localize_hourly_data ([#98](https://github.com/luuuis/hass_omie/issues/98)) ([16c5988](https://github.com/luuuis/hass_omie/commit/16c5988cc117719611d91811cc354af0448c6f71))
+
 ## [2.0.0](https://github.com/luuuis/hass_omie/compare/v2.0.0-beta.3...v2.0.0) (2025-10-01)
 
 
