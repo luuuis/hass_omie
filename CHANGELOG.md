@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.2](https://github.com/luuuis/hass_omie/compare/v2.0.1...v2.0.2) (2025-10-02)
+
+
+### Bug Fixes
+
+* reintroduce sensor.spot_price_es ([#100](https://github.com/luuuis/hass_omie/issues/100)) ([87fd1df](https://github.com/luuuis/hass_omie/commit/87fd1df1104438d18df49910f4cbf2c67b8afaf9))
+
 ## [2.0.1](https://github.com/luuuis/hass_omie/compare/v2.0.0...v2.0.1) (2025-10-01)
 
 
