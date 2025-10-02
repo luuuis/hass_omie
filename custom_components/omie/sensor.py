@@ -81,10 +81,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 cet_yesterday_hourly_data = _localize_hourly_data(yesterday_data, self._series)
                 cet_hourly_data = cet_yesterday_hourly_data | cet_today_hourly_data | cet_tomorrow_hourly_data
 
-                _LOGGER.debug(f'*** {self._key}')
-                _LOGGER.debug(f'today_data: {today_data}')
-                _LOGGER.debug(f'cet_today_hourly_data: {cet_today_hourly_data}')
-
                 local_tz = pytz.timezone(self.hass.config.time_zone)
                 now = utcnow().astimezone(local_tz)
                 today = now.date()
@@ -93,10 +89,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 local_today_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(today, local_tz)}
                 local_tomorrow_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_hours(tomorrow, local_tz)}
                 local_start_of_hour = local_tz.normalize(now.replace(minute=0, second=0, microsecond=0))
-
-                # _LOGGER.debug(f'_day_hours({today}, {local_tz}): {_day_hours(today, local_tz)}')
-                # _LOGGER.debug(f'local_start_of_hour: {local_start_of_hour}')
-                # _LOGGER.debug(f'local_today_hourly_data: {local_today_hourly_data}')
 
                 self._attr_native_value = local_today_hourly_data.get(local_start_of_hour)
                 self._attr_extra_state_attributes = {
@@ -118,7 +110,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     sensors = [
         PriceEntity(sources=coordinators.spot, key="spot_price_pt", series="pt_spot_price", tz=_TZ_LISBON),
-        # PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
+        PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
@@ -146,7 +138,7 @@ def _localize_hourly_data(results: OMIEResults[SpotData], series_name: str) -> d
             for hour in range(hours_in_day)
             for quarter_hour in [hour * 4]
             for hour_start in [CET.normalize(midnight + timedelta(hours=hour))]
-            for hour_average in [statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4])]
+            for hour_average in [round(statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4]), 2)]
         }
 
 
