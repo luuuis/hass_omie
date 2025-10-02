@@ -138,7 +138,7 @@ def _localize_hourly_data(results: OMIEResults[SpotData], series_name: str) -> d
             for hour in range(hours_in_day)
             for quarter_hour in [hour * 4]
             for hour_start in [CET.normalize(midnight + timedelta(hours=hour))]
-            for hour_average in [statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4])]
+            for hour_average in [round(statistics.mean(quarter_hourly_data[quarter_hour:quarter_hour + 4]), 2)]
         }
 
 
