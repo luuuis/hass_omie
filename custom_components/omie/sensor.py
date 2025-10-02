@@ -110,7 +110,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
     sensors = [
         PriceEntity(sources=coordinators.spot, key="spot_price_pt", series="pt_spot_price", tz=_TZ_LISBON),
-        # PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
+        PriceEntity(sources=coordinators.spot, key="spot_price_es", series="es_spot_price", tz=_TZ_MADRID),
     ]
 
     async_add_entities(sensors, update_before_add=True)
