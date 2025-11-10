@@ -107,14 +107,15 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEResults[_DataT] | None]):
         now_cet = utcnow().astimezone(CET)
         none_before = now_cet.replace(hour=cet_hour, minute=cet_minute, second=self._schedule_second,
                                       microsecond=self._schedule_microsecond)
-        next_hour = now_cet.replace(minute=0, second=self._schedule_second, microsecond=self._schedule_microsecond) + timedelta(hours=1)
+        in_15m = now_cet + timedelta(minutes=15)
+        next_quarter_hour = in_15m.replace(minute=in_15m.minute // 15 * 15, second=self._schedule_second,
+                                           microsecond=self._schedule_microsecond)
 
         # next hour or the none_before time, whichever is soonest
-        next_refresh = (none_before if cet_hour == now_cet.hour and none_before > now_cet else next_hour).astimezone()
+        next_refresh = (none_before if cet_hour == now_cet.hour and none_before > now_cet else next_quarter_hour).astimezone()
 
-        _LOGGER.debug("%s: _schedule_refresh scheduling an update at %s (none_before=%s, next_hour=%s)", self.name,
-                      next_refresh,
-                      none_before, next_hour)
+        _LOGGER.debug("%s: _schedule_refresh scheduling an update at %s (none_before=%s, next_quarter_hour=%s)", self.name,
+                      next_refresh, none_before, next_quarter_hour)
         self._unsub_refresh = event.async_track_point_in_utc_time(self.hass, self.__job, next_refresh)
 
     def _wait_for_none_before(self) -> bool:
@@ -135,7 +136,7 @@ class OMIEDailyCoordinator(DataUpdateCoordinator[OMIEResults[_DataT] | None]):
 
 
 def spot_price(client_session: ClientSession, get_market_date: DateFactory) -> UpdateMethod[SpotData]:
-    async def fetch() -> OMIEResults[SpotData] | None:
+    async def fetch() -> OMIEResults[SpotData]:
         return await pyomie_spot(client_session, get_market_date())
 
     return fetch
