@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.0-beta](https://github.com/luuuis/hass_omie/compare/v2.0.2...v2.1.0-beta) (2025-11-11)
+
+
+### Features
+
+* expose 15-minute pricing data ([#103](https://github.com/luuuis/hass_omie/issues/103)) ([2b68b38](https://github.com/luuuis/hass_omie/commit/2b68b38a12cc8e144fc541554dba49ebf06e6c9d))
+
 ## [2.0.2](https://github.com/luuuis/hass_omie/compare/v2.0.1...v2.0.2) (2025-10-02)
 
 
