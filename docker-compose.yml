@@ -3,7 +3,7 @@ version: 'latest'
 services:
   home-assistant:
     container_name: homeassistant_omie
-    image: ghcr.io/home-assistant/home-assistant:2025.1.1
+    image: ghcr.io/home-assistant/home-assistant:2026.5.4
     environment:
       - TZ=UTC
     ports:

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, tzinfo, date
 import pytz
 from homeassistant.components.sensor import SensorEntity, SensorStateClass
 from homeassistant.config_entries import (ConfigEntry)
-from homeassistant.const import CURRENCY_EURO
+from homeassistant.const import CURRENCY_EURO, EVENT_CORE_CONFIG_UPDATE
 from homeassistant.const import UnitOfEnergy
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceEntryType
@@ -16,7 +16,6 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.util import slugify, utcnow
 from pyomie.model import SpotData, OMIEResults
 from pyomie.util import localize_quarter_hourly_data
-from pytz.tzinfo import StaticTzInfo
 
 from . import OMIECoordinators
 from .const import DOMAIN, CET
@@ -59,10 +58,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
             self._series = series
             self._sources = sources
             self._tz = tz
+            self._local_tz = None
             self.entity_id = f"sensor.{self._attr_unique_id}"
 
         async def async_added_to_hass(self) -> None:
             """Register callbacks."""
+            self._local_tz = await self.hass.async_add_executor_job(pytz.timezone, self.hass.config.time_zone)
 
             @callback
             def update() -> None:
@@ -82,14 +83,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
                 cet_yesterday_hourly_data = _localize_quarter_hourly_data(yesterday_data, self._series)
                 cet_hourly_data = cet_yesterday_hourly_data | cet_today_hourly_data | cet_tomorrow_hourly_data
 
-                local_tz = pytz.timezone(self.hass.config.time_zone)
-                now = utcnow().astimezone(local_tz)
+                now = utcnow().astimezone(self._local_tz)
                 today = now.date()
                 tomorrow = today + timedelta(days=1)
 
-                local_today_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_quarter_hours(today, local_tz)}
-                local_tomorrow_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_quarter_hours(tomorrow, local_tz)}
-                local_start_of_quarter_hour = local_tz.normalize(now.replace(minute=now.minute // 15 * 15, second=0, microsecond=0))
+                local_today_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_quarter_hours(today, self._local_tz)}
+                local_tomorrow_hourly_data = {h: cet_hourly_data.get(h.astimezone(CET)) for h in _day_quarter_hours(tomorrow, self._local_tz)}
+                local_start_of_quarter_hour = self._local_tz.normalize(now.replace(minute=now.minute // 15 * 15, second=0, microsecond=0))
 
                 self._attr_native_value = local_today_hourly_data.get(local_start_of_quarter_hour)
                 self._attr_extra_state_attributes = {
@@ -105,6 +105,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 
                 self.async_schedule_update_ha_state()
 
+            async def handle_core_config_update(event) -> None:
+                if 'time_zone' in event.data:
+                    self._local_tz = await self.hass.async_add_executor_job(pytz.timezone, self.hass.config.time_zone)
+                    update()
+
+            self.async_on_remove(self.hass.bus.async_listen(EVENT_CORE_CONFIG_UPDATE, handle_core_config_update))
             self.async_on_remove(self._sources.today.async_add_listener(update))
             self.async_on_remove(self._sources.tomorrow.async_add_listener(update))
             self.async_on_remove(self._sources.yesterday.async_add_listener(update))
@@ -137,7 +143,7 @@ def _localize_quarter_hourly_data(results: OMIEResults[SpotData], series_name: s
     }
 
 
-def _day_quarter_hours(day: date, tz: StaticTzInfo) -> list[datetime]:
+def _day_quarter_hours(day: date, tz) -> list[datetime]:
     """Returns a list of every hour in the given date, normalized to the given time zone."""
     zero = tz.localize(datetime(day.year, day.month, day.day))
     quarter = [tz.normalize(zero + timedelta(hours=m // 4, minutes=(m % 4) * 15)) for m in range(25 * 4)]
