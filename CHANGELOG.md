@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file. See [standa
 ## [2.1.0](https://github.com/luuuis/hass_omie/compare/v2.1.0-beta...v2.1.0) (2026-05-24)
 
 
+### Features
+
+* expose 15-minute pricing data ([#103](https://github.com/luuuis/hass_omie/issues/103)) ([2b68b38](https://github.com/luuuis/hass_omie/commit/2b68b38a12cc8e144fc541554dba49ebf06e6c9d))
+
+
 ### Bug Fixes
 
 * blocking pytz.timezone call from within event loop ([#118](https://github.com/luuuis/hass_omie/issues/118)) ([88da5eb](https://github.com/luuuis/hass_omie/commit/88da5eb6981f93073ab0ec6e079a5ce9d396382d))
