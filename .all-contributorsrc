@@ -1,4 +1,21 @@
 {
-  "projectName": "luuuis",
-  "projectOwner": "hass_omie"
+  "projectName": "hass_omie",
+  "projectOwner": "luuuis",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "luuuis",
+      "name": "Luis Miranda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/161006?v=4",
+      "profile": "https://github.com/luuuis",
+      "contributions": [
+        "code"
+      ]
+    }
+  ]
 }
