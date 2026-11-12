@@ -1,4 +1,4 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![All Contributors](https://img.shields.io/github/all-contributors/luuuis/hass_omie?color=ee8449&style=for-the-badge)](#contributors)
 
 # OMIE Home Assistant Integration
 
