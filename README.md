@@ -1,4 +1,7 @@
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![All Contributors](https://img.shields.io/github/all-contributors/luuuis/hass_omie?color=ee8449&style=for-the-badge)](#contributors)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=for-the-badge)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # OMIE Home Assistant Integration
 
@@ -73,6 +76,8 @@ following button.
   <tbody>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/luuuis"><img src="https://avatars.githubusercontent.com/u/161006?v=4&size=100" width="100px" height="100px" alt="Luis Miranda"/><br /><sub><b>Luis Miranda</b></sub></a><br /><a href="#code-luuuis" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tabascoz"><img src="https://avatars.githubusercontent.com/u/10350083?v=4&size=100" width="100px" height="100px" alt="Fernando Cunha"/><br /><sub><b>Fernando Cunha</b></sub></a><br /><a href="https://github.com/luuuis/hass_omie/commits?author=tabascoz" title="Code">💻</a></td>
+ 
     </tr>
   </tbody>
 </table>
