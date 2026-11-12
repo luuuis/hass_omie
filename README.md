@@ -78,7 +78,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/e
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tabascoz"><img src="https://avatars.githubusercontent.com/u/10350083?v=4&size=100" width="100px" height="100px" alt="Fernando Cunha"/><br /><sub><b>Fernando Cunha</b></sub></a><br /><a href="https://github.com/luuuis/hass_omie/commits?author=tabascoz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tabascoz"><img src="https://avatars.githubusercontent.com/u/10350083?v=4&size=100" width="100px" height="100px" alt="Fernando Cunha"/><br /><sub><b>Fernando Cunha</b></sub></a><br /><a href="https://github.com/luuuis/hass_omie/commits?author=tabascoz" title="Code">💻</a> <a href="#ideas-tabascoz" title="Ideas, Planning, & Feedback">🤔</a></td>
     </tr>
   </tbody>
 </table>
