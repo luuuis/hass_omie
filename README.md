@@ -1,6 +1,6 @@
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-yellow.svg?style=for-the-badge)](https://github.com/custom-components/hacs) [![GitHub release (latest by date)](https://img.shields.io/github/v/release/luuuis/hass_omie?label=Latest%20release&style=for-the-badge)](https://github.com/luuuis/hass_omie/releases) [![GitHub all releases](https://img.shields.io/github/downloads/luuuis/hass_omie/total?style=for-the-badge)](https://github.com/luuuis/hass_omie/releases)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=for-the-badge)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # OMIE Home Assistant Integration
@@ -67,10 +67,7 @@ following button.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=omie)
 
-
-## Contributors ✨
-
-Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/en/reference/emoji-key/)):
+## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -78,7 +75,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/e
 <table>
   <tbody>
     <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tabascoz"><img src="https://avatars.githubusercontent.com/u/10350083?v=4&size=100" width="100px" height="100px" alt="Fernando Cunha"/><br /><sub><b>Fernando Cunha</b></sub></a><br /><a href="https://github.com/luuuis/hass_omie/commits?author=tabascoz" title="Code">💻</a> <a href="#ideas-tabascoz" title="Ideas, Planning, & Feedback">🤔</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/luuuis"><img src="https://avatars.githubusercontent.com/u/161006?v=4&size=100" width="100px" height="100px" alt="Luis Miranda"/><br /><sub><b>Luis Miranda</b></sub></a><br /><a href="#code-luuuis" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/tabascoz"><img src="https://avatars.githubusercontent.com/u/10350083?v=4&size=100" width="100px" height="100px" alt="Fernando Cunha"/><br /><sub><b>Fernando Cunha</b></sub></a><br /><a href="https://github.com/luuuis/hass_omie/commits?author=tabascoz" title="Code">💻</a></td>
+ 
     </tr>
   </tbody>
 </table>
@@ -87,5 +86,3 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/e
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
-
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

@@ -1,27 +1,30 @@
 {
+  "projectName": "hass_omie",
+  "projectOwner": "luuuis",
   "files": [
     "README.md"
   ],
-  "imageSize": 100,
-  "commit": false,
   "commitType": "docs",
   "commitConvention": "angular",
+  "contributorsPerLine": 7,
   "contributors": [
+    {
+      "login": "luuuis",
+      "name": "Luis Miranda",
+      "avatar_url": "https://avatars.githubusercontent.com/u/161006?v=4",
+      "profile": "https://github.com/luuuis",
+      "contributions": [
+        "code"
+      ]
+    },
     {
       "login": "tabascoz",
       "name": "Fernando Cunha",
       "avatar_url": "https://avatars.githubusercontent.com/u/10350083?v=4",
       "profile": "https://github.com/tabascoz",
       "contributions": [
-        "code",
-        "ideas"
+        "code"
       ]
     }
-  ],
-  "contributorsPerLine": 7,
-  "skipCi": true,
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "projectName": "hass_omie",
-  "projectOwner": "luuuis"
+  ]
 }
