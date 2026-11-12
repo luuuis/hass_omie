@@ -4,6 +4,7 @@
   "files": [
     "README.md"
   ],
+  "badgeTemplate": "[![All Contributors](https://img.shields.io/github/all-contributors/<%= projectOwner %>/<%= projectName %>?color=ee8449&style=for-the-badge)](#contributors)",
   "commitType": "docs",
   "commitConvention": "angular",
   "contributorsPerLine": 7,
