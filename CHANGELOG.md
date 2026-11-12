@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.1.1](https://github.com/luuuis/hass_omie/compare/v2.1.0...v2.1.1) (2026-11-12)
+
+
+### Bug Fixes
+
+* today/tomorrow hours incorrect on DST days ([#127](https://github.com/luuuis/hass_omie/issues/127)) ([aae9e89](https://github.com/luuuis/hass_omie/commit/aae9e89ea1c6476f26819e1ec9d10b6138950bbf))
+
+
+### Documentation
+
+* add luuuis as a contributor for code ([#131](https://github.com/luuuis/hass_omie/issues/131)) ([094b623](https://github.com/luuuis/hass_omie/commit/094b623be5403701e65b99f8d9f1ee86e49e56e7))
+* add tabascoz as a contributor for code ([#130](https://github.com/luuuis/hass_omie/issues/130)) ([da77b41](https://github.com/luuuis/hass_omie/commit/da77b412580b1fa49a51fbb7acbff00a38d212f7))
+
 ## [2.1.0](https://github.com/luuuis/hass_omie/compare/v2.1.0-beta...v2.1.0) (2026-05-24)
 
 
