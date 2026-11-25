@@ -35,6 +35,7 @@ General notes regarding the sensors:
 * Sensors marked with a (P) contain **Provisional** values until the results of the last intraday market session are
   published at around 10:30 PM on the day.
 
+<!-- ha-marketplace:exclude-start -->
 ## Installation
 
 Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below.
@@ -59,6 +60,7 @@ Use [HACS](https://hacs.xyz) (preferred) or follow the manual instructions below
 3. Restart Home Assistant
 
 </details>
+<!-- ha-marketplace:exclude-end -->
 
 ## Configuration
 
@@ -67,6 +69,7 @@ following button.
 
 [![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=omie)
 
+<!-- ha-marketplace:exclude-start -->
 ## Contributors
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
@@ -85,3 +88,4 @@ following button.
 <!-- prettier-ignore-end -->
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
+<!-- ha-marketplace:exclude-end -->
